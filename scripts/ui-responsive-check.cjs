@@ -1,0 +1,7 @@
+const {chromium}=require('playwright');const assert=require('node:assert/strict');
+(async()=>{const browser=await chromium.launch({headless:true,executablePath:process.env.CHROMIUM_EXECUTABLE});const page=await browser.newPage();page.setDefaultTimeout(15000);try{
+ await page.goto('http://127.0.0.1:8080/#login');await page.getByLabel('Username',{exact:true}).fill('joshua');await page.getByLabel('Password',{exact:true}).fill('Customer!2026');await page.getByRole('button',{name:'Log in',exact:true}).click();await page.getByRole('heading',{name:'Account information'}).waitFor();
+ for(const width of [320,390,768,1024,1440]){await page.setViewportSize({width,height:900});for(const [route,title] of [['dashboard','Recent transactions'],['transfer','Transfer money'],['profile','My profile']]){await page.goto('http://127.0.0.1:8080/#'+route);await page.locator('.workspace[data-route="'+route+'"]').waitFor();const size=await page.evaluate(()=>({actual:document.documentElement.scrollWidth,viewport:innerWidth}));if(size.actual>size.viewport){await page.screenshot({path:'target/ui-refined/overflow-'+width+'-'+route+'.png',fullPage:true});}assert.ok(size.actual<=size.viewport,`${route} at ${width}: overflow ${size.actual}`);}}
+ await page.setViewportSize({width:390,height:844});assert.equal(await page.locator('.app-navigation').isVisible(),true);
+ console.log('15 responsive route checks (320–1440px) and mobile dock visibility passed.');
+ }finally{await browser.close();}})().catch(e=>{console.error(e);process.exitCode=1});
