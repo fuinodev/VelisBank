@@ -185,3 +185,7 @@ Transaction PIN: customers set or reset a six-digit PIN in Profile → Security 
 PIN flow update: Profile shows Set up PIN when no PIN exists and Reset PIN after setup. Setup asks for the current password, then uses a six-digit keypad for entry and confirmation. Every customer transaction, including deposits, now follows Enter details → Verify PIN → Review & confirm. Verification alone does not move money; the final endpoint checks the PIN again before committing funds.
 
 PIN reset now verifies the account password first, then the current transaction PIN, before allowing a new PIN and its confirmation. The final server request also validates both current credentials. Wrong current credentials share the PIN cooldown; new-PIN reuse and confirmation mistakes do not increase that counter. First-time setup requires the account password only, because no current PIN exists.
+
+## Mobile login update
+
+Customers now use mobile number → SMS OTP → PIN for every login. First verification requires PIN creation; forgot/reset PIN also requires SMS verification. Customer registration no longer asks for a username or password. Administrator login stays available separately. See [mobile login and SMS setup](docs/MOBILE-LOGIN.md) for local testing and real SMS configuration. Earlier username/password customer examples and UI scripts document the previous flow; the new MobileAuthTest covers the replacement API flow.
