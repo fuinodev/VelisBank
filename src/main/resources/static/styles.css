@@ -763,7 +763,7 @@ body { background:#edf2fb; }
 .money-steps .reached { color:#24468e; }
 .money-steps .reached span { background:#284fa9;color:white; }
 .money-steps [aria-current] { font-weight:700; }
-.pin-screen { max-width:300px;margin:auto;text-align:center;position:relative; }
+.pin-screen { width:100%;max-width:360px;margin:auto;text-align:center;position:relative; }
 .pin-emblem { display:grid;place-items:center;background:linear-gradient(140deg,#4568dc,#714cc6);color:white;border-radius:50%;width:52px;height:52px;margin:8px auto 16px;box-shadow:0 8px 20px #5b52ba25; }
 .pin-screen h3 { font-size:20px;margin-bottom:8px; }
 .pin-screen p,.pin-intro { font-size:12px;color:#687792;line-height:1.6;margin-bottom:18px; }
@@ -834,8 +834,8 @@ body { background:#edf2fb; }
 .pin-screen h3 { display:none; }
 .pin-screen p { margin-bottom:8px;line-height:1.4; }
 .pin-screen .pin-dots { margin:10px 0 12px; }
-.pin-screen .pin-keypad { gap:6px;margin:10px 0 12px; }
-.pin-screen .pin-keypad button { height:44px;width:58px;border-radius:14px; }
+.pin-screen .pin-keypad { gap:10px;margin:14px 0 18px; }
+.pin-screen .pin-keypad button { height:56px;width:100%;max-width:88px;border-radius:16px;font-size:22px; }
 .pin-screen .form-error:not(:empty) { margin:6px 0;font-size:11px;line-height:1.3; }
 .pin-screen .pin-back,.pin-screen .pin-help { display:inline-flex;align-items:center;justify-content:center;min-height:32px;margin:4px 8px 0;font-size:11px; }
 @media(max-height:650px) {
@@ -844,6 +844,7 @@ body { background:#edf2fb; }
  .pin-screen .pin-emblem { display:none; }
  .modal:has(.pin-screen) .money-steps { margin-bottom:8px; }
  .pin-screen .pin-keypad { margin:8px 0;gap:4px; }
+ .pin-screen .pin-keypad button { height:clamp(44px,8dvh,52px); }
 }
 @media(max-height:500px) and (min-width:540px) {
  .modal:has(.pin-screen) { width:min(100%,680px); }
@@ -881,7 +882,109 @@ body { background:#edf2fb; }
 }
 @media(max-width:650px) {
  html { scrollbar-gutter:auto; }
- body:has(.workspace),body:has(.workspace) #app { height:var(--visible-app-height,100dvh);min-height:0;overflow:hidden; }
- .workspace { height:var(--visible-app-height,100dvh);max-height:var(--visible-app-height,100dvh);width:100%;margin:0; }
+ body:has(.workspace),body:has(.workspace) #app { height:100%;min-height:0;overflow:hidden; }
+ .workspace { height:100%;max-height:100%;width:100%;margin:0; }
  .workspace > .content { animation:none; }
 }
+/* Reserve separate sidebar rows for the brand, navigation, and account controls. */
+@media(min-width:651px) {
+ .workspace .navigation-panel { display:grid;grid-template-rows:auto minmax(0,1fr) auto;gap:20px;overflow:hidden; }
+ .workspace .navigation-brand-row { display:contents; }
+ .workspace .navigation-brand-row > .brand { grid-row:1;margin:0 9px; }
+ .workspace .navigation-panel > .app-navigation { grid-row:2;min-height:0;overflow-y:auto;justify-content:flex-start;align-self:stretch;padding:3px 0; }
+ .workspace .navigation-panel > .app-navigation a { flex-shrink:0; }
+ .workspace .navigation-tools { grid-row:3;position:static;min-width:0;padding-top:16px;border-top:1px solid #ffffff1a; }
+ .workspace .navigation-tools .user-chip { min-width:0;flex:1; }
+ .workspace .navigation-tools .user-chip > div { min-width:0; }
+ .workspace .navigation-tools .user-chip strong { overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+ .workspace .navigation-tools .nav-logout { flex-shrink:0; }
+}
+
+/* Each document, including a simulator iframe, owns its viewport height. */
+@media(max-width:650px) {
+ html:has(.workspace) { height:100%;overflow:hidden; }
+ body:has(.workspace),body:has(.workspace) #app { height:100%;min-height:0;overflow:hidden; }
+ .workspace { height:100%;max-height:100%; }
+}
+.mobile-auth-brand { margin-bottom:24px; }
+.auth-kicker { display:block;color:#6578bd;letter-spacing:2px;font-size:10px;font-weight:750;margin-bottom:12px; }
+.mobile-auth-note { display:flex;gap:10px;align-items:center;padding:14px;background:#eaf0ff;border:1px solid #d7e2ff;border-radius:14px;color:#344e86;font-size:12px;margin:18px 0; }
+.auth-links { display:flex;gap:18px;align-items:center;justify-content:center;flex-wrap:wrap;margin-top:24px;font-size:12px;color:#455ea2; }
+.auth-links > a, .auth-links > button { display:inline-flex;align-items:center;justify-content:center;min-height:44px;margin:0;padding:8px 0;font-size:12px;font-weight:600;line-height:20px;color:inherit; }
+.otp-label { display:block;font-size:12px;font-weight:650;margin-bottom:12px; }
+.otp-code { width:100%;padding:18px 12px;text-align:center;font-size:30px;font-weight:700;letter-spacing:.35em;background:#eef3ff;border:1px solid #b8c9ee;border-radius:16px;color:#243e78; }
+#otp-countdown { text-align:center;margin:14px 0;color:#6c7895;font-size:12px;font-variant-numeric:tabular-nums; }
+@media(max-width:650px) { .auth-page:has(#mobile-login-form),.auth-page:has(#otp-form) { background:linear-gradient(150deg,#1b3474,#315dc2 65%,#407da2);min-height:100dvh;padding:22px 16px; } .auth-page:has(#mobile-login-form) .auth-aside,.auth-page:has(#otp-form) .auth-aside { display:none; } .auth-page:has(#mobile-login-form) .auth-main,.auth-page:has(#otp-form) .auth-main { min-height:calc(100dvh - 44px);padding:26px 20px;border-radius:24px;background:#f8faff; } }
+/* Keep sign-in focused on the form, with branding and essential help only. */
+.auth-page:has(#mobile-login-form) .auth-aside > p,
+.auth-page:has(#login-form) .auth-aside > p { display:none; }
+.auth-page:has(#mobile-login-form) .auth-aside h1,
+.auth-page:has(#login-form) .auth-aside h1 { font-size:clamp(32px,3.5vw,46px); }
+.auth-card .login-title { margin-bottom:28px; }
+@media(min-width:651px) { .auth-page:has(#mobile-login-form) .mobile-auth-brand { display:none; } }
+/* Shared PIN controls and segmented OTP entry. */
+.pin-screen .pin-dots { gap:10px;margin:14px 0; }
+.pin-screen .pin-dots span { display:grid;place-items:center;width:38px;height:38px;border-radius:50%;font-size:21px;color:#5042aa;background:#f3f1fb;border:1px solid #dedaf1; }
+.pin-screen .pin-dots span.filled { background:#eeebff;border-color:#aaa0e3;box-shadow:0 3px 9px #5745a51a; }
+.pin-screen .pin-visibility { display:flex;margin:0 auto 8px;min-height:36px;gap:7px; }
+.pin-screen .pin-keypad button { width:58px;height:58px;max-width:100%;border-radius:50%;background:linear-gradient(145deg,#fff,#edf0f8);box-shadow:0 3px 8px #26376412,inset 0 1px 0 #fff; }
+.pin-screen .pin-keypad button:hover { background:#5752c8;color:#fff; }
+.otp-emblem { display:grid;place-items:center;width:64px;height:64px;margin:0 auto 22px;border-radius:22px;color:white;background:linear-gradient(135deg,#5850cf,#218b9a);box-shadow:0 8px 22px #4f50bc26; }
+.otp-emblem .icon { width:30px;height:30px; }
+.auth-card:has(#otp-form) { text-align:center; }
+.otp-box-entry { position:relative;margin:18px 0; }
+.otp-box-entry .otp-code { position:absolute;inset:0;width:100%;height:100%;opacity:0;margin:0;cursor:text; }
+.otp-boxes { display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;pointer-events:none; }
+.otp-boxes span { display:grid;place-items:center;height:62px;border:1px solid #baccea;border-radius:12px;background:#f6f9ff;color:#263f77;font-size:25px;font-weight:650; }
+.otp-boxes span.filled { border-color:#7274d8;background:#efefff; }
+.otp-box-entry:focus-within .otp-boxes .current { border-color:#6357d6;box-shadow:0 0 0 3px #6357d622; }
+.otp-box-entry:focus-within { outline:2px solid #8076dc;outline-offset:5px;border-radius:12px; }
+@media(max-width:380px) { .otp-boxes { gap:6px; }.otp-boxes span { height:52px; }.pin-screen .pin-dots { gap:7px; }.pin-screen .pin-dots span { width:32px;height:32px; } }
+@media(max-height:650px) { .pin-screen .pin-keypad button { width:48px;height:48px; }.pin-screen .pin-dots { margin:8px 0; }.pin-screen .pin-visibility { min-height:30px;margin-bottom:4px; } }
+/* App-sized PIN panel: centered identity and comfortable circular keys. */
+.modal:has(.pin-screen) { width:min(100%,420px);padding:24px 28px;background:linear-gradient(160deg,#fff,#f7f8fd);border-radius:28px; }
+.modal:has(.pin-screen) .modal-head { justify-content:flex-end;margin-bottom:0; }
+.modal:has(.pin-screen) .modal-head h2 { position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap; }
+.pin-screen { max-width:320px; }
+.pin-screen .pin-emblem { display:grid;width:58px;height:58px;margin:0 auto 16px;border-radius:20px;background:linear-gradient(145deg,#7770e4,#5341ae);box-shadow:0 8px 20px #5b52ba30,inset 0 1px 0 #ffffff65; }
+.pin-screen .pin-emblem .icon { width:29px;height:29px; }
+.pin-screen h3 { display:block;font-size:21px;margin-bottom:12px; }
+.pin-screen > p,.pin-screen .pin-entry-label { display:none; }
+.pin-screen .pin-dots { margin:16px 0 10px;gap:9px; }
+.pin-screen .pin-dots span { width:36px;height:36px; }
+.pin-screen .pin-keypad { gap:14px 20px;margin:16px auto 22px;max-width:290px; }
+.pin-screen .pin-keypad button { width:64px;height:64px;font-size:24px;font-weight:500; }
+.pin-screen .pin-keypad button[data-pin-key=clear],.pin-screen .pin-keypad button[data-pin-key=delete] { background:transparent;box-shadow:none;color:#69758f; }
+.pin-screen .pin-help { display:none; }
+@media(max-height:700px) { .modal:has(.pin-screen) { padding:12px 24px; }.pin-screen .pin-emblem { width:42px;height:42px;margin:0 auto 10px; }.pin-screen h3 { font-size:19px;margin-bottom:8px; }.pin-screen .pin-keypad { gap:8px 20px;margin:10px auto 14px; }.pin-screen .pin-keypad button { width:52px;height:52px;font-size:22px; }.pin-screen .pin-dots { margin:10px 0 8px; } }
+@media(max-height:500px) and (min-width:540px) { .modal:has(.pin-screen) { width:min(100%,680px); }.pin-screen { max-width:none; }.pin-screen .pin-keypad { margin:0; } }
+.pin-screen .pin-emblem { background:none;box-shadow:none;border-radius:0; }
+.pin-screen .pin-emblem img { width:100%;height:100%;object-fit:contain; }
+/* Minimal confirmation screen, inspired by the mobile reference. */
+.auth-page:has(.otp-confirmation) { display:flex;justify-content:center;background:linear-gradient(145deg,#f9fbff,#edf1fa); }
+.auth-page:has(.otp-confirmation) .auth-aside { display:none; }
+.auth-page:has(.otp-confirmation) .auth-main { width:100%;padding:28px 24px;background:transparent; }
+.auth-card:has(.otp-confirmation) { max-width:360px; }
+.auth-card:has(.otp-confirmation) > .back-link { display:none; }
+.otp-confirmation { text-align:center;padding:24px 12px; }
+.otp-confirmation h1 { font-size:18px;font-weight:650;letter-spacing:0;margin:0 0 30px; }
+.otp-illustration { position:relative;width:112px;height:104px;margin:0 auto 24px;color:#6250b6; }
+.otp-illustration svg { width:100%;height:100%; }
+.otp-illustration img { position:absolute;width:26px;height:26px;left:26px;top:48px; }
+.otp-instruction { font-size:14px;line-height:1.5;color:#7b8498;margin:0 0 24px; }
+.otp-instruction strong { font-weight:500;color:#637089; }
+.otp-confirmation .otp-label { position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%); }
+.otp-confirmation .otp-box-entry { margin:0 0 30px; }
+.otp-confirmation .otp-boxes { gap:8px; }
+.otp-confirmation .otp-boxes span { height:44px;border:0;border-bottom:1.5px solid #9aa4b8;border-radius:0;background:transparent;font-size:23px;font-weight:500;color:#393073; }
+.otp-confirmation .otp-box-entry:focus-within { outline:none; }
+.otp-confirmation .otp-box-entry:focus-within .current { border-bottom:2px solid #6352b5;box-shadow:none;background:#6352b508; }
+.otp-confirmation .btn { border-radius:24px;min-height:44px;margin:0; }
+.otp-confirmation .form-error:empty { display:none; }
+.otp-resend { display:flex;align-items:center;justify-content:center;gap:5px;margin-top:16px;color:#8790a2;font-size:12px; }
+.otp-resend .text-btn { font-size:12px;font-weight:500;min-height:36px; }
+.otp-local-note { display:block;margin-top:10px;font-size:10px;color:#8590a4; }
+.otp-confirmation .otp-change { margin:10px auto 0;font-size:11px;font-weight:500;min-height:36px; }
+@media(max-height:600px) { .otp-confirmation { padding:8px 0; }.otp-confirmation h1 { margin-bottom:16px; }.otp-illustration { width:86px;height:80px;margin-bottom:14px; }.otp-illustration img { width:20px;height:20px;left:20px;top:37px; }.otp-instruction { margin-bottom:16px; } }
+.otp-resend { flex-direction:column-reverse;gap:6px; }
+.otp-resend #otp-countdown { display:block;padding:7px 14px;border-radius:12px;background:#eeedfb;color:#5145a0;font-size:13px;font-weight:650;font-variant-numeric:tabular-nums; }

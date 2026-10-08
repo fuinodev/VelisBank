@@ -114,6 +114,7 @@ public class BankService {
     public Views.Person editProfile(String username,Requests.Profile p) {
         Customer c=person(username); String email=p.email().trim().toLowerCase(Locale.ROOT);
         if(!c.email.equals(email) && customers.existsByEmail(email)) throw new BankException("email","This email is already registered.");
+        if(c.mobileLogin!=null && !MobileNumbers.normalize(p.phone()).equals(c.mobileLogin))throw new BankException("phone","Your verified login number cannot be changed here. Contact support.");
         c.firstName=p.firstName().trim(); c.lastName=p.lastName().trim(); c.email=email; c.phone=p.phone().trim(); c.address=p.address().trim();
         customers.flush(); return Views.Person.of(c);
     }

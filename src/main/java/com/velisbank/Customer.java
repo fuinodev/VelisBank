@@ -16,6 +16,13 @@ public class Customer {
     @Column(nullable=false, length=240) String address;
     @Column(nullable=false) String role = "CUSTOMER";
     @Column(nullable=false) Instant createdAt = Instant.now();
+    @Column(unique=true,length=16) String mobileLogin;
+    String otpHash;
+    String otpBinding;
+    String otpPurpose;
+    Instant otpExpires;
+    @Column(nullable=false,columnDefinition="integer default 0") int otpFailures;
+    Instant phoneVerifiedAt;
     String pinHash;
     @Column(nullable=false,columnDefinition="integer default 0") int pinFailures = 0;
     Instant pinBlockedUntil;

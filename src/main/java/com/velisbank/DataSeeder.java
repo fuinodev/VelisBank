@@ -22,8 +22,8 @@ public class DataSeeder implements CommandLineRunner {
             Customer c=new Customer(); c.username=username; c.passwordHash=encoder.encode(adminPassword); c.firstName="Bank"; c.lastName="Administrator"; c.email=username+"@admin.velisbank.invalid"; c.phone="00000000000"; c.address="VelisBank"; c.role="ADMIN"; customers.save(c);
         }
         if(!demo || customers.existsByUsername("joshua")) return;
-        var joshua=bank.register(new Requests.Registration("Joshua Andrew","Aboga","joshua@example.com","09171234567","Quezon City, Philippines","joshua","Customer!2026","Customer!2026"));
-        var juan=bank.register(new Requests.Registration("Juan","Dela Cruz","juan@example.com","09179876543","Manila, Philippines","juan","Customer!2026","Customer!2026"));
+        bank.register(new Requests.Registration("Joshua Andrew","Aboga","joshua@example.com","09171234567","Quezon City, Philippines","joshua","Customer!2026","Customer!2026"));
+        bank.register(new Requests.Registration("Juan","Dela Cruz","juan@example.com","09179876543","Manila, Philippines","juan","Customer!2026","Customer!2026"));
         bank.transact("joshua",new Requests.Money("DEPOSIT",new BigDecimal("12500.00"),null,"Opening deposit",UUID.randomUUID().toString()));
         bank.transact("juan",new Requests.Money("DEPOSIT",new BigDecimal("6500.00"),null,"Opening deposit",UUID.randomUUID().toString()));
     }

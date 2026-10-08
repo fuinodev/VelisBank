@@ -31,9 +31,16 @@ public class LoginAttempts {
         response.setStatus(429);response.setContentType("application/json");response.setHeader("Retry-After",Long.toString(seconds));
         response.getWriter().write("{\"message\":\"Too many unsuccessful login attempts. Please wait before trying again.\",\"retryAfterSeconds\":"+seconds+"}");
     }
+    private final ConcurrentHashMap<String,long[]> mobileRequests=new ConcurrentHashMap<>();
+    private synchronized boolean allowMobile(String ip) {
+        long now=clock.millis();mobileRequests.entrySet().removeIf(e->e.getValue()[1]<=now);
+        if(mobileRequests.size()>=10000&&!mobileRequests.containsKey(ip))return false;
+        long[] bucket=mobileRequests.computeIfAbsent(ip,k->new long[]{0,now+COOLDOWN});return ++bucket[0]<=20;
+    }
     public OncePerRequestFilter filter() {
         return new OncePerRequestFilter() {
             @Override protected void doFilterInternal(HttpServletRequest request,HttpServletResponse response,FilterChain chain) throws ServletException,IOException {
+                if(request.getMethod().equals("POST") && (request.getServletPath().equals("/api/mobile/otp") || request.getServletPath().equals("/api/mobile/register")) && !allowMobile(request.getRemoteAddr())) {blocked(response,300);return;}
                 if(!request.getServletPath().equals("/api/login") || !request.getMethod().equals("POST")){chain.doFilter(request,response);return;}
                 Attempt a=entry(request.getParameter("username"));
                 // Serialize authentication for the same username to prevent parallel attempts bypassing the limit.

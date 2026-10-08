@@ -6,6 +6,7 @@ public interface CustomerRepository extends JpaRepository<Customer,Long> {
     @org.springframework.data.jpa.repository.Lock(jakarta.persistence.LockModeType.PESSIMISTIC_WRITE)
     @org.springframework.data.jpa.repository.Query("select c from Customer c where c.username = :username")
     Optional<Customer> lockByUsername(@org.springframework.data.repository.query.Param("username") String username);
+    Optional<Customer> findByMobileLogin(String mobileLogin);
     boolean existsByUsername(String username);
     boolean existsByEmail(String email);
 }

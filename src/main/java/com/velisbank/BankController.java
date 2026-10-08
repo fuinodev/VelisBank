@@ -10,13 +10,14 @@ import java.util.*;
 @RestController
 @RequestMapping("/api")
 public class BankController {
+    @org.springframework.beans.factory.annotation.Value("${velisbank.legacy-auth:false}") boolean legacy;
     private final BankService bank;
     private final PinService pins;
     public BankController(BankService bank, PinService pins) { this.bank=bank;this.pins=pins; }
     @GetMapping("/pin") public Map<String,Object> pinStatus(Authentication a) {return pins.status(a.getName());}
     @PostMapping("/pin/verify-password") public Map<String,Boolean> verifyPinPassword(Authentication a,@Valid @RequestBody Requests.PinCredentials p){pins.verifyCredentials(a.getName(),p,false);return Map.of("ok",true);}
     @PostMapping("/pin/verify-current") public Map<String,Boolean> verifyCurrentPin(Authentication a,@Valid @RequestBody Requests.PinCredentials p){pins.verifyCredentials(a.getName(),p,true);return Map.of("ok",true);}
-    @PutMapping("/pin") public Map<String,Boolean> setPin(Authentication a,@Valid @RequestBody Requests.Pin p) {pins.set(a.getName(),p);return Map.of("ok",true);}
+    @PutMapping("/pin") public Map<String,Boolean> setPin(Authentication a,@Valid @RequestBody Requests.Pin p) {if(!legacy)throw new BankException("","Verify an SMS code to set or reset your PIN.");pins.set(a.getName(),p);return Map.of("ok",true);}
     @GetMapping("/csrf") public Map<String,String> csrf(CsrfToken csrf) { return Map.of("token",csrf.getToken(),"headerName",csrf.getHeaderName()); }
     @GetMapping("/session") public Map<String,Object> session(Authentication a) {
         if(a==null || !a.isAuthenticated() || a instanceof org.springframework.security.authentication.AnonymousAuthenticationToken) return Map.of("authenticated",false);
