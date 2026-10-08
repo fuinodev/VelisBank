@@ -9,15 +9,19 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 public class SecurityConfig {
+    @org.springframework.beans.factory.annotation.Value("${velisbank.legacy-auth:false}") boolean legacy;
     @Bean PasswordEncoder passwordEncoder() { return new BCryptPasswordEncoder(); }
     @Bean UserDetailsService users(CustomerRepository customers) {
         return username -> customers.findByUsername(username.trim().toLowerCase(java.util.Locale.ROOT))
+            .filter(c -> legacy || c.role.equals("ADMIN"))
             .map(c -> User.withUsername(c.username).password(c.passwordHash).roles(c.role).build())
             .orElseThrow(() -> new UsernameNotFoundException("Incorrect username or password."));
     }
     @Bean SecurityFilterChain security(HttpSecurity http, LoginAttempts attempts) throws Exception {
         return http.authorizeHttpRequests(a -> a
-            .requestMatchers("/", "/index.html", "/app.js", "/styles.css", "/vendor/**", "/favicon.svg", "/api/csrf", "/api/session", "/api/register", "/api/login", "/error").permitAll()
+            .requestMatchers("/", "/index.html", "/app.js", "/styles.css", "/vendor/**", "/favicon.svg", "/api/csrf", "/api/session", "/api/login", "/error").permitAll()
+            .requestMatchers("/api/mobile/**").permitAll()
+            .requestMatchers("/api/register", "/api/pin/verify-password", "/api/pin/verify-current").access((authentication, context) -> new org.springframework.security.authorization.AuthorizationDecision(legacy))
             .requestMatchers("/api/admin/**").hasRole("ADMIN")
             .requestMatchers("/api/pin", "/api/pin/**", "/api/account", "/api/transactions/**", "/api/money/**").hasRole("CUSTOMER")
             .anyRequest().authenticated())

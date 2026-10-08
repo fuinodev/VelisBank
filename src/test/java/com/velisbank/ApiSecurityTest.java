@@ -26,7 +26,7 @@ class ApiSecurityTest {
             if(body!=null)request.header("Content-Type",path.equals("/api/login")?"application/x-www-form-urlencoded":"application/json");
             return client.send(request.method(method,body==null?HttpRequest.BodyPublishers.noBody():HttpRequest.BodyPublishers.ofString(body)).build(),HttpResponse.BodyHandlers.ofString());
         }
-        void csrf() throws Exception {token=mapper.readTree(request("GET","/api/csrf",null,false).body()).get("token").asText();}
+        void csrf() throws Exception {token=mapper.readTree(request("GET","/api/csrf",null,false).body()).get("token").asString();}
         JsonNode register(String user) throws Exception {
             csrf();var result=request("POST","/api/register",mapper.writeValueAsString(Map.of("firstName","Test","lastName","Customer","username",user,"email",user+"@example.com","phone","09171234567","address","Manila","password","TestingPass!2026","confirmPassword","TestingPass!2026")),true);
             assertThat(result.statusCode()).isEqualTo(200);pins.set(user,new Requests.Pin("TestingPass!2026","582941","582941"));return mapper.readTree(result.body());
@@ -57,7 +57,7 @@ class ApiSecurityTest {
         b.login("admin","TestingAdmin!2026");
         var signedIn=mapper.readTree(b.request("GET","/api/session",null,false).body());
         assertThat(signedIn.get("authenticated").asBoolean()).isTrue();
-        assertThat(signedIn.get("user").get("role").asText()).isEqualTo("ADMIN");
+        assertThat(signedIn.get("user").get("role").asString()).isEqualTo("ADMIN");
         assertThat(signedIn.toString()).doesNotContain("passwordHash");
         assertThat(b.request("POST","/api/logout",null,true).statusCode()).isEqualTo(204);
         assertThat(mapper.readTree(b.request("GET","/api/session",null,false).body()).get("authenticated").asBoolean()).isFalse();
@@ -83,7 +83,7 @@ class ApiSecurityTest {
         Browser b=new Browser();String user=unique();b.register(user);b.login(user,"TestingPass!2026");
         var result=b.request("PUT","/api/password",mapper.writeValueAsString(Map.of("currentPassword","TestingPass!2026","password","TestingPass!2026","confirmPassword","TestingPass!2026")),true);
         assertThat(result.statusCode()).isEqualTo(400);
-        assertThat(mapper.readTree(result.body()).get("errors").get("password").asText()).contains("different from your current password");
+        assertThat(mapper.readTree(result.body()).get("errors").get("password").asString()).contains("different from your current password");
         assertThat(b.request("GET","/api/me",null,false).statusCode()).isEqualTo(200);
         b.login(user,"TestingPass!2026");
     }
