@@ -1,7 +1,41 @@
-/target/
+# Local data: databases, OTPs, credentials, logs and runtime copies
 /data/
-/.env
-*.log
-/.idea/
-/.vscode/
+/target/
 /node_modules/
+*.log
+*.pid
+*.mv.db
+*.trace.db
+*.h2.db
+*.sqlite
+*.sqlite3
+*.db
+*.dump
+*.backup
+*.sql.gz
+
+# Secrets and machine-specific configuration (including nested files)
+.env
+.env.*
+!.env.example
+!.env.template
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+credentials.json
+service-account*.json
+application-local.properties
+application-local.yml
+application-local.yaml
+secrets/
+.aws/
+.ssh/
+
+# Editor and operating-system files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

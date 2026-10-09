@@ -45,9 +45,6 @@ h2 { font-size: 18px; letter-spacing: -.55px; }
 .btn.secondary:hover { background: #f5f7ff; border-color: #b8c5ed; box-shadow: 0 5px 14px #41548a0d; }
 .btn.danger { background: linear-gradient(120deg, #a23758, #c35865); box-shadow: 0 5px 13px #a237581c; }
 .btn.lime { background: linear-gradient(120deg, #beeedf, #a7e4db); color: #285966; }
-.btn:disabled:not(.secondary):not(.danger)::before { content: ''; width: 13px; height: 13px; border: 2px solid #ffffff55; border-top-color: white; border-radius: 50%; animation: spin 700ms linear infinite; }
-#money-form .btn:disabled::before { display: none; }
-#money-form .btn.is-processing::before { display: inline-block; }
 .text-btn { color: #4f5faa; font-size: 12px; gap: 8px; min-height: 30px; }
 .text-btn:hover { color: #294b98; }
 .text-btn .icon { transition: transform 220ms var(--ease); }
@@ -988,3 +985,308 @@ body { background:#edf2fb; }
 @media(max-height:600px) { .otp-confirmation { padding:8px 0; }.otp-confirmation h1 { margin-bottom:16px; }.otp-illustration { width:86px;height:80px;margin-bottom:14px; }.otp-illustration img { width:20px;height:20px;left:20px;top:37px; }.otp-instruction { margin-bottom:16px; } }
 .otp-resend { flex-direction:column-reverse;gap:6px; }
 .otp-resend #otp-countdown { display:block;padding:7px 14px;border-radius:12px;background:#eeedfb;color:#5145a0;font-size:13px;font-weight:650;font-variant-numeric:tabular-nums; }
+/* VelisBank authentication: midnight navy with violet accents. */
+.auth-page,.auth-page:has(#mobile-login-form),.auth-page:has(#otp-form),.auth-page:has(.otp-confirmation) { min-height:100dvh;background:radial-gradient(ellipse at 12% 18%,#44274c65,transparent 45%),radial-gradient(ellipse at 85% 70%,#24456345,transparent 45%),#15172e;color:#f2f0fc;padding:0; }
+.auth-aside { background:radial-gradient(ellipse at 30% 35%,#64458250,transparent 60%),linear-gradient(155deg,#24203e,#121a32);border-right:1px solid #ffffff0c; }
+.auth-aside .brand,.auth-main .brand { color:#f5f3ff; }
+.auth-aside h1 { color:#f6f2ff; }
+.auth-aside h1 span { color:#aea2ff; }
+.auth-aside p,.auth-aside .auth-bottom { color:#b0abc6; }
+.auth-main,.auth-page:has(#mobile-login-form) .auth-main,.auth-page:has(#otp-form) .auth-main,.auth-page:has(.otp-confirmation) .auth-main { background:transparent;border-radius:0;min-height:100dvh;padding:40px 32px; }
+.auth-card { max-width:400px; }
+.auth-card h1,.auth-card .login-title { color:#f6f2ff;font-size:26px;letter-spacing:-.5px; }
+.auth-card > p,.auth-card .field label,.auth-card label { color:#c4bfd6; }
+.auth-card .field input,.auth-card .field textarea,.auth-card .field select { background:#17182c;border:1px solid #55516d;color:#f5f2ff;border-radius:12px;min-height:50px;box-shadow:none; }
+.auth-card input::placeholder,.auth-card textarea::placeholder { color:#9792ae; }
+.auth-card input:focus,.auth-card textarea:focus { border-color:#a79af7;outline:2px solid #8a79e42b;outline-offset:2px; }
+.auth-card input:autofill { box-shadow:0 0 0 1000px #232139 inset;-webkit-text-fill-color:#f5f2ff; }
+.auth-card .field small,.auth-card .hint,.auth-link { color:#aaa5c1; }
+.auth-card .btn,.modal:has(.pin-screen) .btn { background:linear-gradient(110deg,#5145b4,#6551c9);border:1px solid #8b78ec35;border-radius:28px;min-height:48px;color:#fff;box-shadow:0 8px 22px #07071935; }
+.auth-card .btn:hover,.modal:has(.pin-screen) .btn:hover { background:linear-gradient(110deg,#6354cc,#7862df); }
+.auth-card .auth-links,.auth-card .text-btn,.auth-link a { color:#b9abff; }
+.auth-card .form-error:not(:empty) { color:#ffbac9;background:#582d433d;border-radius:10px;padding:10px;font-size:12px; }
+.auth-card .warning { color:#e3d3aa;background:#b28a2520;border-color:#c9a14f40; }
+.auth-card .auth-kicker { color:#b8a9fa; }
+.otp-confirmation h1 { font-size:18px;letter-spacing:0; }
+.otp-illustration { color:#b0a0ff; }
+.otp-illustration svg path[fill] { fill:#1c1a35; }
+.otp-instruction,.otp-instruction strong { color:#c2bcd4; }
+.otp-confirmation .otp-boxes span { color:#f4efff;border-color:#807797; }
+.otp-confirmation .otp-box-entry:focus-within .current { border-color:#baa9ff;background:#a890ff12; }
+.otp-resend #otp-countdown { background:#a795ff15;color:#c9beff; }
+.otp-local-note { color:#a49cb9; }
+.modal:has(.pin-screen) { background:radial-gradient(ellipse at 0 0,#50335155,transparent 60%),#191a32;color:#f3efff;border:1px solid #655e853d;box-shadow:0 24px 90px #09091b80; }
+.modal:has(.pin-screen) .icon-btn { background:#ffffff08;border-color:#70668f66;color:#cfc4ef; }
+.pin-screen h3 { color:#f3efff; }
+.pin-screen .pin-dots span { background:#26233e;border-color:#504768;color:#e1d7ff; }
+.pin-screen .pin-dots span.filled { background:#41365e;border-color:#9982d5;box-shadow:none; }
+.pin-screen .pin-keypad button { background:linear-gradient(145deg,#302c49,#25223c);color:#f0ebff;box-shadow:0 4px 10px #08081940,inset 0 1px 0 #ffffff09; }
+.pin-screen .pin-keypad button:hover,.pin-screen .pin-keypad button:active { background:#6551bc;color:#fff; }
+.pin-screen .pin-keypad button[data-pin-key=clear],.pin-screen .pin-keypad button[data-pin-key=delete],.pin-screen .pin-visibility,.pin-screen .pin-back { color:#bfb0ea; }
+.pin-screen .form-error { color:#ffbac9; }
+@media(max-width:650px) { .auth-page .auth-aside { display:none; }.auth-page { display:block; }.auth-main,.auth-page:has(#mobile-login-form) .auth-main,.auth-page:has(#otp-form) .auth-main { padding:32px 26px; }.auth-card { max-width:360px; }.auth-card .form-grid { grid-template-columns:1fr; } }
+.welcome-screen { min-height:100dvh;display:grid;place-items:center;padding:32px 24px;background:radial-gradient(ellipse at 28% 30%,#5c30534d,transparent 45%),radial-gradient(ellipse at 65% 60%,#20527355,transparent 40%),#16182f;color:#f7f4ff; }
+.welcome-content { width:100%;max-width:340px;text-align:center; }
+.welcome-art { width:min(100%,290px);margin:0 auto 24px; }
+.welcome-art svg { display:block;width:100%;height:auto;filter:drop-shadow(0 14px 22px #080b2330); }
+.welcome-content > p { font-size:16px;margin-bottom:5px;color:#e1dced; }
+.welcome-brand { display:flex;align-items:center;justify-content:center;gap:9px; }
+.welcome-brand h1 { font-size:26px;letter-spacing:-.5px; }
+.welcome-start { display:flex;margin:42px auto 0;width:100%;max-width:280px;border-radius:28px;background:linear-gradient(110deg,#5145b4,#6551c9);min-height:48px;color:#fff;box-shadow:0 8px 22px #07071935; }
+.welcome-start:hover { background:#7662d7; }
+@media(max-height:600px) { .welcome-art { width:190px;margin-bottom:12px; }.welcome-start { margin-top:26px; } }
+/* Keep the compact registration layout on phones. */
+@media(max-width:650px) {
+ .auth-page:has(#register-form) .auth-main { padding:28px 22px;align-items:center; }
+ .auth-card:has(#register-form) { max-width:440px; }
+ .auth-card #register-form .form-grid { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px; }
+ #register-form .form-grid .field { min-width:0; }
+ #register-form .field input { width:100%;min-width:0; }
+ .auth-card:has(#register-form) h1 { font-size:26px; }
+ .auth-card:has(#register-form) > p { font-size:13px;line-height:1.7;margin-bottom:28px; }
+}
+@media(max-width:350px) {
+ .auth-page:has(#register-form) .auth-main { padding:24px 16px; }
+ .auth-card #register-form .form-grid { gap:12px; }
+ #register-form .field label { font-size:11px; }
+}
+/* Welcome motion stays subtle and respects accessibility preferences. */
+.welcome-art { animation:welcome-float 5s ease-in-out infinite;will-change:transform; }
+.welcome-content > p,.welcome-brand { animation:welcome-reveal .7s ease-out both; }
+.welcome-brand { animation-delay:.12s; }
+.welcome-start { animation:welcome-reveal .75s .24s ease-out both;transition:background .25s ease,box-shadow .25s ease,translate .25s ease,scale .15s ease; }
+.welcome-start:hover { translate:0 -3px;box-shadow:0 12px 30px #7762dc45; }
+.welcome-start:active { translate:0 0;scale:.97; }
+.welcome-start:focus-visible { outline:3px solid #c0b4ff;outline-offset:5px; }
+@keyframes welcome-float { 0%,100% { transform:translateY(0) rotate(-1deg); } 50% { transform:translateY(-10px) rotate(1deg); } }
+@keyframes welcome-reveal { from { opacity:0;transform:translateY(12px); } to { opacity:1;transform:translateY(0); } }
+@media(prefers-reduced-motion:reduce) { .welcome-art,.welcome-content > p,.welcome-brand,.welcome-start { animation:none;transition:none;will-change:auto; }.welcome-start:hover,.welcome-start:active { translate:none;scale:1; } }
+@media(max-width:650px) {
+ .auth-page:has(#mobile-login-form,#login-form) .auth-main { display:flex;align-items:center;justify-content:center;min-height:100dvh;padding:28px 22px; }
+ .auth-card:has(#mobile-login-form,#login-form) { width:100%;max-width:360px;margin:auto; }
+}
+/* Unified signed-in midnight/violet theme. */
+body:has(.workspace) { --ink:#f1edfc;--muted:#aaa4bf;--line:#45405c;--shadow:0 8px 26px #07091826;background:#15172e;color:var(--ink); }
+.workspace { min-height:100dvh;background:radial-gradient(ellipse at 5% 10%,#59335435,transparent 45%),radial-gradient(ellipse at 90% 65%,#23466335,transparent 50%),#15172e;color:#f1edfc; }
+.navigation-panel,.sidebar,.workspace .topbar { background:linear-gradient(160deg,#24203d,#171b32);border-color:#ffffff10;color:#eee9ff; }
+.workspace .brand,.navigation-panel .brand,.sidebar .brand { color:#f4f0ff; }
+.workspace .content { background:transparent; }
+.workspace h1,.workspace h2,.workspace h3,.workspace strong,.workspace .stat-value,.workspace .tx-name,.workspace .info-row dd { color:#f0ecfb; }
+.workspace .gradient-text { background:linear-gradient(110deg,#b7a5ff,#80c8d1);background-clip:text;-webkit-text-fill-color:transparent; }
+.workspace .muted,.workspace .page-heading p,.workspace .stat-label,.workspace .stat-foot,.workspace .tx-meta,.workspace .info-row dt,.workspace .breadcrumb,.workspace .date-chip,.workspace .user-chip small { color:#aaa5c0; }
+.workspace .card,.workspace .history-card,.workspace .insight-card,.workspace .sidebar-note { background:linear-gradient(145deg,#25223e,#1d2038);border-color:#52476766;box-shadow:0 8px 26px #090b1b24; }
+.workspace .card-head,.workspace .info-row,.workspace .transaction-row,.workspace th,.workspace td { border-color:#49415b66; }
+.workspace table,.workspace thead,.workspace th { background:transparent;color:#b6aecb; }
+.workspace tbody tr:hover,.workspace .transaction-row:hover { background:#a28bea0c; }
+.workspace .balance-card { background:radial-gradient(ellipse at 100% 10%,#4d668875,transparent 65%),linear-gradient(125deg,#514397,#292b59);border-color:#a896dd33;box-shadow:0 16px 35px #080b2538; }
+.workspace .balance-value,.workspace .balance-card strong { color:white; }
+.workspace .btn { background:linear-gradient(110deg,#5145b4,#6551c9);border-color:#8b78ec35;color:white; }
+.workspace .btn:hover { background:linear-gradient(110deg,#6354cc,#7862df); }
+.workspace .btn.secondary,.workspace .icon-btn,.workspace .date-chip { background:#292640;border-color:#554b70;color:#d8cef4; }
+.workspace .text-btn,.workspace .heading-link { color:#bcadfb; }
+.workspace input,.workspace select,.workspace textarea,.workspace .search-input { background:#191b31;color:#f3efff;border-color:#59516e; }
+.workspace input::placeholder,.workspace textarea::placeholder { color:#a199b4; }
+.workspace .field label,.workspace .hint { color:#bcb3d0; }
+.workspace .app-navigation,.workspace .nav { background:transparent; }
+.workspace .app-navigation a,.navigation-panel .app-navigation a,.sidebar .nav a { color:#b4adc9; }
+.workspace .app-navigation a:is(.active,:hover,:focus-visible),.navigation-panel .app-navigation a:is(.active,:hover,:focus-visible),.sidebar .nav a:is(.active,:hover) { background:linear-gradient(115deg,#5143a5,#494279);color:#fff;border-color:#a18cd53b;box-shadow:0 4px 16px #09091820; }
+.workspace .nav-icon,.navigation-panel .nav-icon { color:inherit; }
+.workspace .avatar,.navigation-panel .avatar { background:linear-gradient(135deg,#564681,#354869);color:#e5dcff; }
+.workspace .user-chip,.navigation-panel .user-chip { border-color:#ffffff15; }
+.workspace .logout,.navigation-panel .logout { color:#bcb2d2; }
+.workspace .quick-actions .action-card { background:linear-gradient(145deg,#352e55,#292846);border:1px solid #79649555;box-shadow:0 5px 16px #08091c22; }
+.workspace .quick-actions .action-card:nth-child(2) { background:linear-gradient(145deg,#293c55,#252c43);border-color:#52748c55; }
+.workspace .quick-actions .action-card:nth-child(3) { background:linear-gradient(145deg,#27483f,#243340);border-color:#548d7a55; }
+.workspace .quick-actions .action-card strong { color:#f1ebff; }
+.workspace .quick-actions .action-card .action-icon { background:#b099ef18;color:#cbb7ff; }
+.workspace .quick-actions .action-card:nth-child(2) .action-icon { background:#7bbae718;color:#99d1f1; }
+.workspace .quick-actions .action-card:nth-child(3) .action-icon { background:#79dab318;color:#92e3c6; }
+.workspace .badge { background:#174f40;color:#a5efd0; }
+.workspace .badge.frozen { background:#594129;color:#f5d296; }
+.workspace .tx-value.in { color:#83dfbc; }
+.workspace .tx-value.out { color:#dbc9ff; }
+.workspace .tx-icon { background:#b09be51a;color:#c8b5f5; }
+.workspace .tx-icon.in { background:#76d6b31a;color:#93dfc4; }
+.workspace .filter-tabs button,.workspace .filter-btn { background:#25243d;color:#bdb4d1;border-color:#4b425f; }
+.workspace .filter-tabs button.active,.workspace .filter-btn.active { background:#5a49b5;color:white;border-color:#8c77d0; }
+body:has(.workspace) .modal:not(:has(.pin-screen)) { background:#202039;color:#f1ebff;border:1px solid #554a6d; }
+body:has(.workspace) .modal .muted { color:#bab1cc; }
+body:has(.workspace) .modal input,body:has(.workspace) .modal select { background:#181a30;color:#f2edff;border-color:#635573; }
+body:has(.workspace) .modal .info-row { border-color:#524762; }
+body:has(.workspace) .modal .info-row dd { color:#f0eaff; }
+@media(max-width:650px) {
+ .workspace .app-navigation { background:linear-gradient(110deg,#242039,#1b2038);border-top:1px solid #66567c66; }
+ .workspace .mobile-greeting,.workspace .mobile-page-title,.workspace .mobile-greeting strong { color:#eee8fa; }
+ .workspace .app-navigation a:is(.active,:hover,:focus-visible,:active) { background:linear-gradient(115deg,#5143a5,#494279);color:white; }
+ .workspace .app-navigation a:is(.active,:hover,:focus-visible,:active) .nav-icon { color:#e0ccff;background:#c5a9ff15; }
+}
+.workspace .filters { background:#1b1c32;border-color:#4b425f; }
+.workspace .filter { background:transparent;color:#bdb4d1;border-color:transparent; }
+.workspace .filter:is(.active,:hover,:focus-visible) { background:#5a49b5;color:#fff;border-color:#8c77d0; }
+.workspace .account-tools a,.workspace .account-tools button { color:#d8cfee; }
+.workspace .account-pulse { background:linear-gradient(135deg,#3b3264,#254450);border-color:#6c5b8c55; }
+.workspace .account-flow { background:#ffffff08;border-color:#ffffff12; }
+/* Administration icons share one neutral circular treatment. */
+.workspace[data-role=ADMIN] .stat-label > .icon { width:40px;height:40px;padding:10px;border-radius:50%;background:#ffffff09;color:#d1ccdc;border:1px solid #ffffff14;box-shadow:none; }
+.workspace[data-role=ADMIN] .nav-icon { width:34px;height:34px;display:grid;place-items:center;border-radius:50%;background:#ffffff09;color:#d1ccdc;box-shadow:none; }
+.workspace[data-role=ADMIN] .app-navigation a:is(.active,:hover,:focus-visible,:active) .nav-icon { background:#ffffff12;color:#f2eff7;border-radius:50%;box-shadow:none; }
+.workspace[data-role=ADMIN] .icon-btn { border-radius:50%;background:#ffffff09;color:#d1ccdc;border-color:#ffffff14; }
+.workspace[data-role=ADMIN] .action-icon,.workspace[data-role=ADMIN] .tool-symbol,.workspace[data-role=ADMIN] .tx-icon { border-radius:50%;background:#ffffff09;color:#d1ccdc;border:1px solid #ffffff14; }
+/* Amount entry uses one dark surface across desktop, mobile and focus. */
+.workspace .field .amount-input input { appearance:textfield;-moz-appearance:textfield;background:#191b31;color:#f3efff;border:1px solid #59516e;border-radius:12px;min-height:64px;font-size:28px;padding:14px 16px 14px 40px;box-shadow:none;color-scheme:dark; }
+.workspace .field .amount-input input:focus { background:#191b31;border-color:#a695ec;outline:2px solid #a695ec25;outline-offset:2px; }
+.workspace .field .amount-input input::placeholder { color:#aaa1bd; }
+.workspace .field .amount-input input::-webkit-inner-spin-button,.workspace .field .amount-input input::-webkit-outer-spin-button { -webkit-appearance:none;margin:0; }
+.workspace .field .amount-input input:-webkit-autofill { -webkit-box-shadow:0 0 0 1000px #191b31 inset;-webkit-text-fill-color:#f3efff;caret-color:#f3efff; }
+.workspace .field .amount-input > span { top:50%;transform:translateY(-50%);left:16px;color:#aaa1bd; }
+/* Compact, colored admin icons on mobile. */
+@media(max-width:650px) {
+ .workspace[data-role=ADMIN] .stat-label > .icon { width:30px;height:30px;padding:7px;background:#a48ae51a;color:#c5acff;border-color:#a48ae530; }
+ .workspace[data-role=ADMIN] .stat-grid > :nth-child(2) .stat-label > .icon { background:#66d5ac18;color:#83e2bc;border-color:#66d5ac30; }
+ .workspace[data-role=ADMIN] .stat-grid > :nth-child(3) .stat-label > .icon { background:#e8bc7118;color:#edc889;border-color:#e8bc7130; }
+ .workspace[data-role=ADMIN] .stat-grid > :nth-child(4) .stat-label > .icon { background:#77bce918;color:#9bd5f5;border-color:#77bce930; }
+ .workspace[data-role=ADMIN] .nav-icon { width:28px;height:28px;background:transparent;color:#b7a4e3; }
+ .workspace[data-role=ADMIN] .nav-icon .icon { width:18px;height:18px; }
+ .workspace[data-role=ADMIN] .app-navigation a:is(.active,:hover,:focus-visible,:active) .nav-icon { background:#b39bf526;color:#d3baff; }
+ .workspace[data-role=ADMIN] .icon-btn { width:32px;height:32px;color:#b9a3f0;background:#a48ae514; }
+ .workspace[data-role=ADMIN] .icon-btn .icon { width:17px;height:17px; }
+}
+/* Shared dark dialog surfaces for confirmation, receipts and account actions. */
+body:has(.workspace) .modal h2,body:has(.workspace) .modal h3,body:has(.workspace) .modal .receipt-amount { color:#f2edff; }
+body:has(.workspace) .modal .receipt-hero p,body:has(.workspace) .modal .info-row dt { color:#b9afcd; }
+body:has(.workspace) .modal .receipt-details { background:linear-gradient(135deg,#2b2643,#222b40);border:1px solid #554968;box-shadow:none; }
+body:has(.workspace) .modal .receipt-details .info-row dd { color:#eee7fc; }
+body:has(.workspace) .modal .icon-btn { background:#ffffff08;color:#cfc2e9;border-color:#6e5d884d; }
+body:has(.workspace) .modal .icon-btn:hover { background:#ffffff12;color:#fff; }
+body:has(.workspace) .modal .btn { background:linear-gradient(110deg,#5145b4,#6551c9);border-color:#8b78ec35;color:#fff; }
+body:has(.workspace) .modal .btn:hover { background:linear-gradient(110deg,#6354cc,#7862df); }
+body:has(.workspace) .modal .btn.secondary { background:#312c47;color:#ded3f3;border-color:#695979; }
+body:has(.workspace) .modal .btn.secondary:hover { background:#423654; }
+body:has(.workspace) .modal .btn.danger { background:#843d55;color:#fff;border-color:#b86a81; }
+body:has(.workspace) .modal .money-steps li { color:#a99dbd; }
+body:has(.workspace) .modal .money-steps li.reached,body:has(.workspace) .modal .money-steps li[aria-current] { color:#d5c5fc; }
+body:has(.workspace) .modal .money-steps li span { background:#39304e;color:#c7b8dc; }
+body:has(.workspace) .modal .money-steps li.reached span { background:#6550b3;color:white; }
+body:has(.workspace) .modal .receipt-icon { background:linear-gradient(145deg,#254b43,#213b39);color:#94e4c0;border-color:#4e8770;box-shadow:none; }
+body:has(.workspace) .modal .badge { background:#214a3d;color:#a3e6c9; }
+/* Consistent, readable validation in the midnight theme. */
+.auth-page .form-error:not(:empty),.workspace .form-error:not(:empty),body .modal .form-error:not(:empty) { background:#482737;border:1px solid #91536c;color:#ffd5df;border-radius:10px;padding:10px 12px;line-height:1.5;box-shadow:none; }
+.auth-page .field-error,.workspace .field-error,body .modal .field-error { color:#ffb7ca; }
+.auth-page .field input.invalid,.workspace .field input.invalid,body .modal input.invalid,.auth-page input[aria-invalid=true],.workspace input[aria-invalid=true],body .modal input[aria-invalid=true] { border-color:#d47c99;outline-color:#d47c9940; }
+.workspace .warning,body .modal .warning { background:#443827;border:1px solid #806b43;color:#f3dcab; }
+/* Account management rows retain contrast in every interaction state. */
+.workspace .account-tools > a { background:transparent;color:#e8e0f7;border-color:#51465f; }
+.workspace .account-tools > a:is(:hover,:focus-visible,:active) { background:#39304f;color:#fff;border-color:#75618d; }
+.workspace .account-tools > a strong { color:#f0e9fc; }
+.workspace .account-tools > a small { color:#b9aecb; }
+.workspace .account-tools > a > .icon { color:#baacd3; }
+.workspace .account-tools .tool-symbol { background:#7760c329;color:#c4afff;border:1px solid #9478d83d; }
+.workspace .account-tools .tool-symbol.security { background:#3c8d7129;color:#9de4c6;border-color:#67b8963d; }
+.workspace .account-tools .tool-symbol.activity { background:#9262ba29;color:#dfb5ff;border-color:#ab7cd03d; }
+.workspace .transaction-row .tx-icon { background:#33594f;color:#a1e4cc;border:1px solid #659e8545;border-radius:50%; }
+.workspace .transaction-row .tx-icon.out { background:#3e3255;color:#d5b7f5;border-color:#9876bb45; }
+.workspace .transaction-row .tx-value.out { color:#ff9eb0; }
+.workspace .transaction-row .tx-value.in { color:#8ce3be; }
+.workspace .transaction-row .tx-value small { color:#b0a5c2; }
+/* Account and history summaries share the same dark surfaces and amount colors. */
+.workspace .summary-grid > .card,.workspace .summary-grid > .card:nth-child(2),.workspace .account-flow > a { background:linear-gradient(135deg,#393450,#2e3b4d);border:1px solid #71668166;box-shadow:none; }
+.workspace .summary-grid .stat-label,.workspace .summary-grid .stat-foot,.workspace .account-flow > a > span { color:#c5bdd6; }
+.workspace .summary-grid > .card:first-child .stat-value,.workspace .account-flow > a:first-child strong { color:#8ce3be!important; }
+.workspace .summary-grid > .card:nth-child(2) .stat-value,.workspace .account-flow > a:nth-child(2) strong { color:#ff9eb0; }
+.workspace .summary-grid .stat-label .icon { background:#ffffff08;color:#c8bcdf;border-radius:50%; }
+/* Quiet, theme-matched scrollbars for the page and nested panels. */
+html,* { scrollbar-width:thin;scrollbar-color:transparent transparent; }
+*::-webkit-scrollbar { width:7px;height:7px; }
+*::-webkit-scrollbar-track,*::-webkit-scrollbar-corner { background:transparent; }
+*::-webkit-scrollbar-thumb { background:transparent;border-radius:999px;border:2px solid transparent;background-clip:padding-box; }
+html.is-scrolling,.is-scrolling { scrollbar-color:#8f80b488 transparent; }
+html.is-scrolling::-webkit-scrollbar-thumb,.is-scrolling::-webkit-scrollbar-thumb { background-color:#8f80b488; }
+html.is-scrolling::-webkit-scrollbar-thumb:hover,.is-scrolling::-webkit-scrollbar-thumb:hover { background-color:#b8a6df; }
+@media(forced-colors:active) { html,* { scrollbar-color:auto;scrollbar-width:auto; } }
+/* Empty-state illustration matches the surrounding dark cards. */
+.workspace .empty > .icon,.modal .empty > .icon { background:#39304f;color:#c8b4ef;border:1px solid #75618d55;border-radius:50%;box-shadow:none; }
+.workspace .empty h3,.modal .empty h3 { color:#f0e9fc; }
+.workspace .empty p,.modal .empty p { color:#b9aecb; }
+/* Compact overview icons at every viewport; include padding within their size. */
+.workspace[data-role=ADMIN] .stat-grid .stat-label > .icon { box-sizing:border-box;width:34px;height:34px;min-width:34px;padding:7px;border-radius:50%;background:#a48ae51a;color:#c5acff;border:1px solid #a48ae530; }
+.workspace[data-role=ADMIN] .stat-grid > :nth-child(2) .stat-label > .icon { background:#66d5ac18;color:#83e2bc;border-color:#66d5ac30; }
+.workspace[data-role=ADMIN] .stat-grid > :nth-child(3) .stat-label > .icon { background:#e8bc7118;color:#edc889;border-color:#e8bc7130; }
+.workspace[data-role=ADMIN] .stat-grid > :nth-child(4) .stat-label > .icon { background:#77bce918;color:#9bd5f5;border-color:#77bce930; }
+@media(max-width:650px) { .workspace[data-role=ADMIN] .stat-grid .stat-label > .icon { width:30px;height:30px;min-width:30px;padding:6px; } }
+/* Tablet layouts preserve usable control widths instead of squeezing labels. */
+.workspace .filter-bar { min-width:0;flex-wrap:wrap;gap:14px; }
+.workspace .filters { display:flex;flex-wrap:wrap;gap:6px;min-width:0;flex-shrink:0; }
+.workspace .filter { flex:0 0 auto;white-space:nowrap;min-height:40px;padding:10px 14px; }
+.workspace .filter-bar .search-input { min-width:0;flex:1 1 210px; }
+.workspace .quick-actions { grid-template-columns:repeat(3,minmax(0,1fr)); }
+.workspace .quick-actions .action-card { min-width:0; }
+@media(min-width:651px) and (max-width:1100px) {
+ .workspace .filter-bar { flex-direction:column;align-items:stretch; }
+ .workspace .filters { display:grid;grid-template-columns:repeat(4,minmax(0,1fr));width:100%;padding:5px; }
+ .workspace .filter { width:100%;min-width:0;font-size:11px;padding:10px 6px; }
+ .workspace .filter-bar .search-input { flex:none;width:100%;max-width:none; }
+ .workspace .quick-actions .action-card { flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:9px;padding:14px 8px; }
+ .workspace .quick-actions .action-card strong { font-size:12px; }
+ .workspace .quick-actions .action-card small { display:none; }
+ .workspace .dashboard-grid,.workspace .account-layout { grid-template-columns:minmax(0,1fr); }
+ .workspace .two-col { grid-template-columns:minmax(0,1fr); }
+ .workspace .stat-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+@media(min-width:651px) and (max-width:850px) {
+ .workspace .filters { grid-template-columns:repeat(2,minmax(0,1fr)); }
+ .workspace .summary-grid .stat-value { font-size:clamp(20px,3vw,28px);letter-spacing:-.7px; }
+}
+@media(max-width:650px) {
+ .workspace .filter-bar .search-input { flex:none;width:100%; }
+ .workspace .filters { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%;padding:5px; }
+ .workspace .filter { min-width:0;width:100%;padding:10px 6px; }
+}
+/* Keep summary amounts readable on the narrowest phones. */
+@media(max-width:370px) {
+ .workspace .summary-grid { grid-template-columns:minmax(0,1fr); }
+}
+/* Transaction filters stay on one row, with horizontal scrolling when needed. */
+.workspace .filters { display:flex;flex-wrap:nowrap;max-width:100%;overflow-x:auto; }
+.workspace .filters .filter { flex:1 0 auto;width:auto;min-width:max-content; }
+
+.pin-screen .forgot-verified-pin { display:block;margin:12px auto 0;min-height:36px;color:#c4b5ff;font-size:12px; }
+.reset-confirmation .reset-note { color:#b9aecb;font-size:13px;line-height:1.6;margin:-4px 0 24px; }
+.reset-confirmation .otp-illustration { margin-top:28px;margin-bottom:32px; }
+.reset-key { position:absolute;right:-4px;bottom:0;display:grid;place-items:center;width:40px;height:40px;border-radius:50%;background:#39304f;border:1px solid #75618d;color:#d6c6ff; }
+.reset-key .icon { width:22px;height:22px; }
+
+/* Keep verified-login secondary actions together below the keypad. */
+.pin-screen:has(.forgot-verified-pin) .pin-back,
+.pin-screen:has(.forgot-verified-pin) .forgot-verified-pin { display:inline-flex;align-items:center;justify-content:center;vertical-align:middle;width:auto;min-height:32px;margin:4px 12px 0;font-size:11px; }
+
+.profile-reset-otp { text-align:center; }.profile-reset-otp .field { text-align:left; }.reset-profile-brand { display:flex;justify-content:center;align-items:center;gap:14px;margin:18px 0;color:#c4b5ff; }.profile-reset-otp p { color:#b9aecb;line-height:1.6;margin:18px 0; }.profile-reset-otp .form-actions { justify-content:center; }
+/* Preserve dark field surfaces while typing and restore dashboard contrast. */
+.workspace .field textarea,
+.workspace .field textarea:focus,
+body:has(.workspace) .modal .field textarea,
+body:has(.workspace) .modal .field textarea:focus { background:#191b31;color:#f3efff;border-color:#59516e;color-scheme:dark; }
+.workspace .field textarea:focus,
+body:has(.workspace) .modal .field textarea:focus { border-color:#a695ec;box-shadow:0 0 0 3px #a695ec25; }
+.workspace .insight-card p { color:#bcb3d0; }
+.workspace .insight-card > .icon { background:#7760c329;color:#c4afff;border:1px solid #9478d83d; }
+.workspace .insight-card .text-btn,
+.workspace .insight-card .text-btn .icon { color:#c4afff; }
+
+.profile-otp-digits { display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px; }
+body:has(.workspace) .modal .profile-otp-digits input { width:100%;min-width:0;height:54px;padding:0;text-align:center;font-size:23px;border-radius:10px;background:#191b31;color:#f3efff;border:1px solid #75618d; }
+body:has(.workspace) .modal .profile-otp-digits input:focus { border-color:#b9a5ff;outline:2px solid #a695ec50;outline-offset:2px; }
+
+.otp-resend-notice { color:#c4b5ff;font-size:12px;line-height:1.6;margin:12px 0 18px; }
+
+#otp-countdown:empty,#reset-countdown:empty { display:none; }
+
+/* Profile reset mirrors login OTP while staying over the blurred workspace. */
+.modal:has(.profile-reset-otp) { max-width:460px; }
+.modal:has(.profile-reset-otp) .modal-head h2 { font-size:18px; }
+.profile-reset-otp .otp-illustration { margin:24px auto; }
+.profile-reset-otp .field > label { position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%); }
+body:has(.workspace) .modal .profile-otp-digits input { height:44px;min-height:44px;background:transparent;border:0;border-bottom:1.5px solid #8e839f;border-radius:0;color:#eee7fc;box-shadow:none; }
+body:has(.workspace) .modal .profile-otp-digits input:focus { border-bottom:2px solid #b7a3ff;outline:none;background:#a695ec08; }
+.profile-reset-otp .btn { border-radius:24px;min-height:44px; }
+.profile-reset-otp #reset-countdown:not(:empty) { display:table;margin:16px auto 6px;padding:7px 14px;border-radius:12px;background:#2b2949;color:#c4b5ff;font-size:13px;font-weight:650; }
+.profile-reset-otp #reset-resend { color:#c4b5ff;font-size:12px;margin:8px auto; }

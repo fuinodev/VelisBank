@@ -35,11 +35,18 @@ public class MobileAuthService {
         customers.flush();
     }
     @Transactional(noRollbackFor=BankException.class)
+    public Map<String,Object> sendProfileReset(String username,String binding) {
+        Customer c=customers.lockByUsername(username).orElseThrow();
+        // Successful login rotates the session ID; its consumed code need not delay a profile reset.
+        if("LOGIN".equals(c.otpPurpose)&&c.otpHash==null)c.otpExpires=Instant.now().minusSeconds(1);
+        return send(c.phone,"PROFILE_RESET",binding);
+    }
+    @Transactional(noRollbackFor=BankException.class)
     public Map<String,Object> send(String phone,String purpose,String binding) {
-        if(!Set.of("LOGIN","RESET").contains(purpose))throw new BankException("","Invalid verification purpose.");
+        if(!Set.of("LOGIN","RESET","PROFILE_RESET").contains(purpose))throw new BankException("","Invalid verification purpose.");
         Customer found=find(phone),c=customers.lockByUsername(found.username).orElseThrow();
         Instant now=Instant.now();
-        if(c.otpExpires!=null && c.otpExpires.isAfter(now)) {
+        if(c.otpExpires!=null && c.otpExpires.isAfter(now) && !((purpose.equals("RESET")||purpose.equals("PROFILE_RESET")) && ("LOGIN".equals(c.otpPurpose)||(purpose.equals("PROFILE_RESET")&&purpose.equals(c.otpPurpose))) && c.otpHash==null && Objects.equals(c.otpBinding,binding))) {
             // Reopening the same flow resumes its countdown without sending another SMS.
             if(Objects.equals(c.otpBinding,binding)&&Objects.equals(c.otpPurpose,purpose))return status(c);
             throw new BankException("","A code was already requested. Wait until "+c.otpExpires+" before requesting another.");
@@ -49,19 +56,30 @@ public class MobileAuthService {
         c.otpHash=encoder.encode(code);c.otpBinding=binding;c.otpPurpose=purpose;c.otpExpires=now.plusSeconds(30);c.otpFailures=0;
         return status(c);
     }
-    Map<String,Object> status(Customer c){return Map.of("expiresAt",c.otpExpires.toString(),"localTest",delivery.local());}
+    Map<String,Object> status(Customer c){return Map.of("expiresAt",c.otpExpires.toString(),"localTest",delivery.local(),"remainingMillis",Math.max(0,java.time.Duration.between(Instant.now(),c.otpExpires).toMillis()));}
     public record Grant(String username,String purpose,Instant expires,String pinVersion) implements java.io.Serializable {}
     @Transactional(noRollbackFor=BankException.class)
     public Grant verify(String phone,String purpose,String code,String binding) {
         Customer c=customers.lockByUsername(find(phone).username).orElseThrow();
         if(c.otpExpires==null||!c.otpExpires.isAfter(Instant.now())||c.otpHash==null||!Objects.equals(c.otpBinding,binding)||!Objects.equals(c.otpPurpose,purpose))
-            throw new BankException("code","This code is expired or unavailable. Request a new code after the countdown.");
+            throw new BankException("code","This OTP has expired or is no longer valid. Select Resend code and enter the newest OTP.");
         if(c.otpFailures>=3)throw new BankException("code","Too many incorrect codes. Wait for this code to expire before requesting another.");
-        if(code==null||!code.matches("[0-9]{6}")||!encoder.matches(code,c.otpHash)) {c.otpFailures++;throw new BankException("code","Incorrect code. "+(3-c.otpFailures)+" attempts remaining.");}
+        if(code==null||!code.matches("[0-9]{6}")||!encoder.matches(code,c.otpHash)) {c.otpFailures++;throw new BankException("code","Invalid OTP. Use the newest code sent to your number. "+(3-c.otpFailures)+" attempts remaining.");}
         c.otpHash=null;c.phoneVerifiedAt=Instant.now();c.mobileLogin=MobileNumbers.normalize(phone);
         return new Grant(c.username,purpose,Instant.now().plusSeconds(300),c.pinHash);
     }
-    public boolean needsPin(Grant grant){return grant.pinVersion()==null||grant.purpose().equals("RESET");}
+    @Transactional(readOnly=true)
+    public boolean resumable(Grant grant) {
+        return grant!=null && grant.expires().isAfter(Instant.now())
+            && customers.findByUsername(grant.username())
+                .filter(c -> Objects.equals(c.pinHash,grant.pinVersion())).isPresent();
+    }
+    @Transactional(readOnly=true)
+    public String verifiedPhone(Grant grant) {
+        if(!resumable(grant))throw new BankException("","Verification expired. Start again with a new OTP.");
+        return MobileNumbers.normalize(customers.findByUsername(grant.username()).orElseThrow().phone);
+    }
+    public boolean needsPin(Grant grant){return grant.pinVersion()==null||(grant.purpose().equals("RESET")||grant.purpose().equals("PROFILE_RESET"));}
     @Transactional(noRollbackFor=BankException.class)
     public String complete(Grant grant,String pin,String confirmation) {
         if(grant==null||!grant.expires().isAfter(Instant.now()))throw new BankException("","Verification expired. Start again with a new OTP.");

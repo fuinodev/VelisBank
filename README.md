@@ -11,8 +11,8 @@ Prerequisites: Java 25+, Maven 3.9+, and PostgreSQL 18. These are already instal
 From `C:\VelisBank` in PowerShell:
 
 ```powershell
-mvn package
-.\scripts\start.ps1
+    mvn package
+    .\scripts\start.ps1
 ```
 
 Open [VelisBank](http://localhost:8080).
@@ -189,3 +189,13 @@ PIN reset now verifies the account password first, then the current transaction 
 ## Mobile login update
 
 Customers now use mobile number → SMS OTP → PIN for every login. First verification requires PIN creation; forgot/reset PIN also requires SMS verification. Customer registration no longer asks for a username or password. Administrator login stays available separately. See [mobile login and SMS setup](docs/MOBILE-LOGIN.md) for local testing and real SMS configuration. Earlier username/password customer examples and UI scripts document the previous flow; the new MobileAuthTest covers the replacement API flow.
+
+### Isolated responsive layout checks
+
+Run `npm run test:responsive` to check the current local interface without starting the backend or using customer credentials. These Playwright checks serve the workspace assets with synthetic API responses and never change account data. They cover 195 customer/admin route and viewport combinations from 320px through 1440px, including tablet breakpoint boundaries, filter selection, search, page overflow, and clipped action/filter/summary labels. Screenshots and results are saved to `target/tablet-checks`. This verifies presentation and browser interactions; it does not replace authentication or backend integration tests.
+
+### Rebuild an already-running app on Windows
+
+Use `.\scripts\rebuild-start.ps1` to stop the project JVMs, build with tests, and start only after a successful build. Windows locks a running JAR, so running `mvn package` while the packaged app is active can cause a rename failure and leave a non-executable JAR. The stop script handles both the Java launcher and its child JVM, without stopping PostgreSQL. For local SMS testing, set `$env:SMS_MODE = 'local'` before running the script.
+
+Startup now copies the successful package to `data/runtime/velisbank-<port>.jar` and runs that copy, keeping Maven's `target` JAR unlocked. It also checks the port and executable manifest before launching. Use `scripts/rebuild-start.ps1` to stop existing project instances, build, and launch the new version; a plain build does not update an already-running app.

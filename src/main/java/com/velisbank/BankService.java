@@ -55,7 +55,7 @@ public class BankService {
     private void validateMoney(Requests.Money r, Account from, Account to) {
         active(from);
         if(!Set.of("DEPOSIT","WITHDRAWAL","TRANSFER").contains(r.type())) throw new BankException("type","Choose a valid transaction type.");
-        if(r.amount()==null || r.amount().signum()<=0 || r.amount().scale()>2 || r.amount().compareTo(new BigDecimal("999999999.99"))>0)
+        if(r.amount().signum()<=0 || r.amount().scale()>2 || r.amount().compareTo(new BigDecimal("999999999.99"))>0)
             throw new BankException("amount","Enter an amount from ₱0.01 to ₱999,999,999.99 with at most two decimals.");
         if(!r.type().equals("DEPOSIT") && from.balance.compareTo(r.amount())<0) throw new BankException("amount","Insufficient balance for this transaction.");
         if(to!=null) {
@@ -77,7 +77,7 @@ public class BankService {
         Account snapshot=own(username);
         Account toSnapshot=r.type().equals("TRANSFER") ? recipient(r,snapshot) : null;
         // A consistent lock order prevents two opposing transfers from deadlocking.
-        List<Long> ids=new ArrayList<>(); ids.add(snapshot.id); if(toSnapshot!=null) ids.add(toSnapshot.id); ids.sort(Long::compareTo);
+        List<Long> ids=new ArrayList<>(); ids.add(snapshot.id); if(toSnapshot!=null) ids.add(toSnapshot.id); ids.sort(Comparator.naturalOrder());
         Map<Long,Account> locked=new HashMap<>();
         for(Long id:ids) {
             Account current=accounts.lockById(id).orElseThrow();

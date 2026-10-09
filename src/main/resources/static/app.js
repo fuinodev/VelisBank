@@ -45,7 +45,7 @@ function field(name,title,type='text',value='',opts={}) {
   return `<div class="field"><label for="${id}">${title}</label>${input}${opts.hint?`<span class="field-hint">${opts.hint}</span>`:''}<span class="field-error" id="error-${name}"></span></div>`;
 }
 function info(rows) { return `<dl class="info-list">${rows.map(([key,value])=>`<div class="info-row"><dt>${key}</dt><dd>${value}</dd></div>`).join('')}</dl>`; }
-function brand() { return `<a class="brand" href="#${state.user?'dashboard':'home'}"><img class="brandmark" src="/vendor/velis-logo.svg" alt="" width="39" height="39">VelisBank</a>`; }
+function brand() { return `<a class="brand" href="#${state.user?'dashboard':'login'}"><img class="brandmark" src="/vendor/velis-logo.svg" alt="" width="39" height="39">VelisBank</a>`; }
 function empty(title='No transactions yet',description='Your banking activity will appear here after your first transaction.') { return `<div class="empty">${icon('receipt-text')}<h3>${title}</h3><p>${description}</p></div>`; }
 function sampleBalanceCard(a,sample=false) { return `<div class="balance-card"><div class="balance-top">${!sample&&state.user?.role==='CUSTOMER'?`<a class="balance-title card-destination" href="#account" aria-label="View savings account">${icon('wallet-cards')} Savings Account ${icon('arrow-up-right')}</a>`:`<span class="card-bank-brand"><img src="/favicon.svg" alt="" width="32" height="32"><span>VelisBank<small>Savings account</small></span></span>`}${badge(a.status)}</div><div class="balance-label">Available balance</div><div class="balance-value">${money(a.balance)}</div><div class="balance-bottom"><div class="balance-number"><small>Account number</small><span id="balance-number">${esc(state.reveal&&!sample?a.number:masked(a.number))}</span></div>${sample?`<span class="balance-brand">VelisBank</span>`:`<button class="text-btn" data-action="reveal">${icon(state.reveal?'eye-off':'eye')}<span>${state.reveal?'Hide':'Show'} number</span></button>`}</div></div>`; }
 function balanceCard(a,sample=false) {
@@ -55,7 +55,7 @@ function balanceCard(a,sample=false) {
 }
 function accountInfo(a) { return `<section class="card"><div class="card-head"><h2>${state.user?.role==='CUSTOMER'?'<a class="card-destination" href="#account">Account information</a>':'Account information'}</h2>${icon('landmark')}</div>${info([['Account holder',esc(fullName(a.customer))],['Account type','Savings'],['Account number',esc(a.number)],['Account status',badge(a.status)]])}<div class="info-foot">${icon('shield-check')} Your account, all in one place.</div></section>`; }
 function frozen(a) { return a.status==='FROZEN'?`<div class="warning" role="status">${icon('circle-alert')}<div><strong>Account temporarily frozen</strong><p>Deposits, withdrawals, and transfers are unavailable. You can still view your account, history, and profile.</p></div></div>`:''; }
-function transactionRows(rows) { return rows.length?`<div class="transaction-list">${rows.map(t=>`<button class="transaction-row" data-transaction="${t.id}"><span class="tx-icon ${t.amount<0?'out':''}">${icon(t.type==='DEPOSIT'?'landmark':t.type==='WITHDRAWAL'?'banknote':'arrow-left-right')}</span><span class="tx-main"><span class="tx-name">${esc(t.type.startsWith('TRANSFER')?`${t.amount<0?'Transfer to':'Transfer from'} ${t.counterpartyName}`:label(t.type))}</span><span class="tx-meta" style="display:block">${date(t.createdAt)}${t.counterpartyNumber?' · '+masked(t.counterpartyNumber):' · Savings account'}</span></span><span class="tx-value ${t.amount>0?'in':''}">${t.amount>0?'+':'−'}${money(Math.abs(t.amount))}<small>Completed</small></span></button>`).join('')}</div>`:empty(); }
+function transactionRows(rows) { return rows.length?`<div class="transaction-list">${rows.map(t=>`<button class="transaction-row" data-transaction="${t.id}"><span class="tx-icon ${t.amount<0?'out':''}">${icon(t.type==='DEPOSIT'?'landmark':t.type==='WITHDRAWAL'?'banknote':'arrow-left-right')}</span><span class="tx-main"><span class="tx-name">${esc(t.type.startsWith('TRANSFER')?`${t.amount<0?'Transfer to':'Transfer from'} ${t.counterpartyName}`:label(t.type))}</span><span class="tx-meta" style="display:block">${date(t.createdAt)}${t.counterpartyNumber?' · '+masked(t.counterpartyNumber):' · Savings account'}</span></span><span class="tx-value ${t.amount>0?'in':'out'}">${t.amount>0?'+':'−'}${money(Math.abs(t.amount))}<small>Completed</small></span></button>`).join('')}</div>`:empty(); }
 const titles={dashboard:'Dashboard',account:'My account',deposit:'Deposit funds',withdraw:'Withdraw funds',transfer:'Transfer money',transactions:'Transactions',profile:'My profile',customers:'Customers',accounts:'Accounts',customer:'Customer details'};
 function shell(route,body,subtitle='') {
  const admin=state.user.role==='ADMIN', active=route==='customer'?'customers':['deposit','withdraw'].includes(route)?'account':route;
@@ -93,10 +93,7 @@ function accountPage() {
  const incoming=rows.reduce((sum,t)=>sum+Math.max(0,Number(t.amount)),0),outgoing=rows.reduce((sum,t)=>sum+Math.max(0,-Number(t.amount)),0);
  shell('account',`${frozen(a)}<div class="account-layout"><div class="stack">${balanceCard(a)}<div class="quick-actions">${[['deposit','landmark','Deposit'],['withdraw','banknote','Withdraw'],['transfer','arrow-left-right','Transfer']].map(([path,ic,title])=>`<button class="action-card" data-go="${path}" ${a.status==='FROZEN'?'disabled':''}><span class="action-icon">${icon(ic)}</span><strong>${title}</strong></button>`).join('')}</div><section class="account-pulse"><div class="card-head"><h2>Account activity</h2><a href="#transactions" aria-label="View account activity">${icon('arrow-up-right')}</a></div><div class="account-flow"><a href="#transactions"><span>${icon('arrow-down-left')} Money in</span><strong>${money(incoming)}</strong></a><a href="#transactions"><span>${icon('arrow-up-right')} Money out</span><strong>${money(outgoing)}</strong></a></div><small>All recorded activity · ${rows.length} transactions</small></section></div><div class="stack"><section class="card account-tools"><h2>Manage your account</h2><a href="#profile"><span class="tool-symbol">${icon('user-round')}</span><span><strong>Personal details</strong><small>Keep your profile up to date</small></span>${icon('chevron-right')}</a><a href="#profile"><span class="tool-symbol security">${icon('shield-check')}</span><span><strong>Security</strong><small>Manage your PIN and mobile verification</small></span>${icon('chevron-right')}</a><a href="#transactions"><span class="tool-symbol activity">${icon('receipt-text')}</span><span><strong>Transaction history</strong><small>Review your account activity</small></span>${icon('chevron-right')}</a></section><section class="card account-recent"><div class="card-head"><h2>Latest activity</h2><a href="#transactions" class="text-btn">View all</a></div>${transactionRows(rows.slice(0,3))}</section></div></div>`,'Your account, activity and everyday controls.');
 }
-function landing() {
- app.innerHTML=`<div class="landing"><header class="public-nav">${brand()}<div><a href="#login">Log in</a><a class="btn" href="#register">Open an account ${icon('arrow-up-right')}</a></div></header><main><section class="hero"><div><span class="eyebrow">${icon('sprout')} A simpler way to bank</span><h1>Your money.<br>Your everyday.<br><em>Made simple.</em></h1><p>A little less complexity. A little more clarity. Manage your simulated finances in one thoughtfully simple space.</p><div class="hero-actions"><a class="btn" href="#register">Open an account ${icon('arrow-up-right')}</a><a class="btn secondary" href="#login">Log in</a></div><span class="hero-note">${icon('shield-check')} Simulated funds. Real learning.</span></div><div class="hero-art">${balanceCard({balance:12500,status:'ACTIVE',number:'1029384752'},true)}<div class="hero-mini"><span class="tx-icon">${icon('landmark')}</span><span><strong>Deposit completed</strong><small>Every little step adds up.</small></span><b>+₱2,000</b></div><p class="sample-caption">An illustration of your future dashboard.</p></div></section><section class="features"><article class="card feature"><span class="action-icon">${icon('shield-check')}</span><h2><a class="card-destination" href="#register">A space that’s yours</a></h2><p>Your own account, protected by secure authentication. Everything starts with you.</p></article><article class="card feature"><span class="action-icon">${icon('arrow-left-right')}</span><h2><a class="card-destination" href="#login">Move money, simply</a></h2><p>Deposit, withdraw, and transfer simulated funds to other VelisBank accounts.</p></article><article class="card feature"><span class="action-icon">${icon('receipt-text')}</span><h2><a class="card-destination" href="#login">See the whole picture</a></h2><p>Clear balances and a record of every transaction. Know where things stand.</p></article></section></main><footer class="landing-foot">© ${new Date().getFullYear()} VelisBank · A simulated banking application. No real money is held or transferred.</footer></div>`;renderIcons();
-}
-function authLayout(body) {app.innerHTML=`<div class="auth-page"><aside class="auth-aside">${brand()}<h1>Banking that fits<br>your <span>everyday.</span></h1><p>A simple, thoughtful space for your finances. Your next chapter starts here.</p><div class="auth-bottom">${icon('shield-check')} Simulated funds. Real learning.</div></aside><main class="auth-main"><div class="auth-card"><a class="back-link" href="#home">${icon('arrow-left')} Back to VelisBank</a>${body}</div></main></div>`;renderIcons();}
+function authLayout(body) {app.innerHTML=`<div class="auth-page"><aside class="auth-aside">${brand()}<h1>Banking that fits<br>your <span>everyday.</span></h1><p>A simple, thoughtful space for your finances. Your next chapter starts here.</p><div class="auth-bottom">${icon('shield-check')} Simulated funds. Real learning.</div></aside><main class="auth-main"><div class="auth-card">${body}</div></main></div>`;renderIcons();}
 let loginTimer;
 function adminLogin(message='') {
  clearInterval(loginTimer);
@@ -110,10 +107,19 @@ function adminLogin(message='') {
  loginForm.onsubmit=async e=>{e.preventDefault();updateCooldown();if(loginForm.dataset.cooling)return;const attemptKey=storageKey();const form=e.currentTarget,button=form.querySelector('[type=submit]');button.disabled=true;button.textContent='Logging in…';try {await api('/login',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams(new FormData(form))});await csrf();state.user=await api('/me');state.reveal=false;location.hash='dashboard';}catch(err){errors(form,err);button.disabled=false;button.textContent='Log in';if(err.attemptsRemaining!==undefined){form.querySelector('.form-error').textContent=`Incorrect username or password. ${err.attemptsRemaining} attempt${err.attemptsRemaining===1?'':'s'} remaining before a 5-minute cooldown.`;}if(err.status===429){cooldowns[attemptKey]=Date.now()+Number(err.retryAfterSeconds||300)*1000;try{localStorage.setItem('velisbank-login-cooldowns',JSON.stringify(cooldowns));}catch{}updateCooldown();}}};
 }
 function registration() {
- authLayout(`<h1>Join VelisBank.</h1><p>Your mobile number is your login. No username or password needed.</p><form id="register-form"><div class="form-error" role="alert"></div><div class="form-grid">${field('firstName','First name','text','',{max:60})}${field('lastName','Last name','text','',{max:60})}${field('phone','Mobile number','tel','',{max:24,autocomplete:'tel',hint:'Philippines · 09XX XXX XXXX'})}${field('email','Email address','email','',{max:160})}</div>${field('address','Address','text','',{max:240})}<button class="btn full" type="submit">Create account</button></form><p class="auth-link">Already registered? <a href="#login">Log in</a></p>`);
+ authLayout(`<div class="mobile-auth-brand">${brand()}</div><h1 class="login-title">Registration</h1><form id="register-form"><div class="form-error" role="alert"></div><div class="form-grid">${field('firstName','First name','text','',{max:60})}${field('lastName','Last name','text','',{max:60})}${field('phone','Mobile number','tel','',{max:24,autocomplete:'tel',hint:'Philippines · 09XX XXX XXXX'})}${field('email','Email address','email','',{max:160})}</div>${field('address','Address','text','',{max:240})}<button class="btn full" type="submit">Create account</button></form><p class="auth-link">Already registered? <a href="#login">Log in</a></p>`);
  document.getElementById('register-form').onsubmit=async e=>{e.preventDefault();const f=e.currentTarget,b=f.querySelector('[type=submit]'),values=formValues(f);b.disabled=true;try{await api('/mobile/register',{method:'POST',body:JSON.stringify(values)});state.pendingPhone=values.phone;state.loginMessage='Account created. Verify your mobile number to continue.';location.hash='login';}catch(err){errors(f,err);b.disabled=false;}};
 }
-function login(message='') { mobileLogin(message,state.pendingPhone||'');state.pendingPhone=''; }
+async function login(message='') {
+ const version=state.routeVersion;
+ authLayout('<h1>Log in</h1><p>Checking mobile verification...</p>');
+ try {
+  const verification=await api('/mobile/verification',{cache:'no-store'});
+  if(version!==state.routeVersion)return;
+  if(verification.verified){mobilePin(verification.createPin);return;}
+ } catch(err) {if(version!==state.routeVersion)return;message=err.message;}
+ mobileLogin(message,state.pendingPhone||'');state.pendingPhone='';
+}
 function mobileLogin(message='',phone='',purpose='LOGIN') {
  clearInterval(loginTimer);
  authLayout(`<div class="mobile-auth-brand">${brand()}</div><h1 class="login-title">${purpose==='RESET'?'Reset PIN':'Log in'}</h1>${message?`<div class="warning">${esc(message)}</div>`:''}<form id="mobile-login-form"><div class="form-error" role="alert"></div>${field('phone','Mobile number','tel',phone,{max:24,autocomplete:'tel',hint:'09XX XXX XXXX or +63 9XX XXX XXXX'})}<button class="btn full" type="submit">Continue ${icon('arrow-right')}</button></form><div class="auth-links"><button class="text-btn" id="forgot-pin">${purpose==='RESET'?'Back to login':'Forgot PIN?'}</button><a href="#register">Create account</a></div>`);
@@ -122,21 +128,42 @@ function mobileLogin(message='',phone='',purpose='LOGIN') {
 }
 function otpScreen(phone,purpose,result) {
  clearInterval(loginTimer);
- authLayout(`<section class="otp-confirmation"><h1>Confirmation</h1><div class="otp-illustration" aria-hidden="true"><svg viewBox="0 0 120 110" fill="none"><rect x="20" y="26" width="43" height="75" rx="9" stroke="currentColor" stroke-width="2.5"/><path d="M20 83h43M32 34h12" stroke="currentColor" stroke-width="2.5"/><circle cx="42" cy="92" r="2" fill="currentColor"/><path d="M59 12h42a7 7 0 0 1 7 7v23a7 7 0 0 1-7 7H79L67 61V49h-8a7 7 0 0 1-7-7V19a7 7 0 0 1 7-7Z" fill="#f9faff" stroke="currentColor" stroke-width="2.5"/><path d="M64 30h1m9 0h1m9 0h1m9 0h1" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg><img src="/favicon.svg" alt="" width="26" height="26"></div><p class="otp-instruction">${result.localTest?'Enter the 6-digit test code for':'Enter the 6-digit code sent to'}<br><strong>${esc(phone)}</strong></p><form id="otp-form"><label class="otp-label" for="otp-code">Verification code</label><input id="otp-code" name="code" class="otp-code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" required aria-describedby="otp-countdown"><div class="form-error" role="alert"></div><button class="btn full" type="submit">Next</button></form><div class="otp-resend"><button class="text-btn" id="resend-code" disabled>Resend code</button><span id="otp-countdown" role="timer"></span></div>${result.localTest?'<small class="otp-local-note">Local test · Code in application log</small>':''}<button class="text-btn otp-change" id="change-number">Change number</button></section>`);
- const f=document.getElementById('otp-form'),resend=document.getElementById('resend-code');const update=()=>{if(!f.isConnected){clearInterval(loginTimer);return;}const left=Math.max(0,Math.ceil((Date.parse(result.expiresAt)-Date.now())/1000));document.getElementById('otp-countdown').textContent=left?`Time remaining 00:${String(left).padStart(2,'0')}`:'00:00 — Resend code';resend.disabled=left>0;if(!left)f.querySelector('[type=submit]').disabled=true;};update();loginTimer=setInterval(update,1000);
+ authLayout(`<section class="otp-confirmation ${purpose==='RESET'?'reset-confirmation':''}"><h1>${purpose==='RESET'?'Forgot PIN':'Confirmation'}</h1><div class="otp-illustration" aria-hidden="true"><svg viewBox="0 0 120 110" fill="none"><rect x="20" y="26" width="43" height="75" rx="9" stroke="currentColor" stroke-width="2.5"/><path d="M20 83h43M32 34h12" stroke="currentColor" stroke-width="2.5"/><circle cx="42" cy="92" r="2" fill="currentColor"/><path d="M59 12h42a7 7 0 0 1 7 7v23a7 7 0 0 1-7 7H79L67 61V49h-8a7 7 0 0 1-7-7V19a7 7 0 0 1 7-7Z" fill="#f9faff" stroke="currentColor" stroke-width="2.5"/><path d="M64 30h1m9 0h1m9 0h1m9 0h1" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg><img src="/favicon.svg" alt="" width="26" height="26"></div><p class="otp-instruction">${result.localTest?'Enter the 6-digit test code for':'Enter the 6-digit code sent to'}<br><strong>${esc(purpose==='RESET'?'09*****'+phone.slice(-4):phone)}</strong></p>${purpose==='RESET'?'<p class="reset-note">Verify your mobile number to create a new PIN.</p>':''}<form id="otp-form"><label class="otp-label" for="otp-code">Verification code</label><input id="otp-code" name="code" class="otp-code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" required aria-describedby="otp-countdown"><div class="form-error" role="alert"></div><button class="btn full" type="submit">Next</button></form><div class="otp-resend"><button class="text-btn" id="resend-code" disabled>Resend code</button><span id="otp-countdown" role="timer"></span></div><button class="text-btn otp-change" id="change-number">Change number</button></section>`);
+ if(purpose==='RESET'){
+  const illustration=document.querySelector('.otp-illustration');
+  illustration.insertAdjacentHTML('beforeend',`<span class="reset-key">${icon('key-round')}</span>`);renderIcons();
+ }
+ const deadline=performance.now()+Number(result.remainingMillis??Math.max(0,Date.parse(result.expiresAt)-Date.now()));const f=document.getElementById('otp-form'),resend=document.getElementById('resend-code');const update=()=>{if(!f.isConnected){clearInterval(loginTimer);return;}const left=Math.max(0,Math.ceil((deadline-performance.now())/1000));document.getElementById('otp-countdown').textContent=left?`Resend available in ${left}s`:'';resend.disabled=left>0;};update();loginTimer=setInterval(update,1000);
  const otpInput=f.elements.code,slots=document.createElement('div'),otpWrap=document.createElement('div');
  otpWrap.className='otp-box-entry';slots.className='otp-boxes';slots.setAttribute('aria-hidden','true');slots.innerHTML='<span></span>'.repeat(6);
  otpInput.before(otpWrap);otpWrap.append(otpInput,slots);
  otpInput.oninput=()=>{otpInput.value=otpInput.value.replace(/\D/g,'').slice(0,6);slots.querySelectorAll('span').forEach((slot,i)=>{slot.textContent=otpInput.value[i]||'';slot.classList.toggle('filled',i<otpInput.value.length);slot.classList.toggle('current',i===otpInput.value.length);});};otpInput.oninput();
 
  f.onsubmit=async e=>{e.preventDefault();const b=f.querySelector('[type=submit]');b.disabled=true;try{const grant=await api('/mobile/verify',{method:'POST',body:JSON.stringify({phone,purpose,code:f.elements.code.value})});clearInterval(loginTimer);mobilePin(grant.createPin);}catch(err){errors(f,err);b.disabled=false;update();}};
- resend.onclick=async()=>{resend.disabled=true;try{otpScreen(phone,purpose,await api('/mobile/otp',{method:'POST',body:JSON.stringify({phone,purpose})}));}catch(err){errors(f,err);resend.disabled=false;}};
+ resend.onclick=async()=>{resend.disabled=true;try{otpScreen(phone,purpose,await api('/mobile/otp',{method:'POST',body:JSON.stringify({phone,purpose})}));document.querySelector('.otp-instruction').insertAdjacentHTML('afterend','<p role="status" class="otp-resend-notice">New OTP sent. Your previous code has expired. Enter the newest code.</p>');}catch(err){errors(f,err);resend.disabled=false;}};
  document.getElementById('change-number').onclick=()=>mobileLogin('',phone,purpose);
 }
+async function forgotVerifiedPin(button) {
+ button.disabled=true;
+ try {
+  const verification=await api('/mobile/verification',{cache:'no-store'});
+  if(!verification.verified){closeModal();mobileLogin('Verification expired. Enter your mobile number to reset your PIN.','','RESET');return;}
+  const phone=verification.phone;
+  const result=await api('/mobile/otp',{method:'POST',body:JSON.stringify({phone,purpose:'RESET'})});
+  closeModal();otpScreen(phone,'RESET',result);
+ } catch(err) {const box=document.getElementById('keypad-error');if(box)box.textContent=err.message;}
+ finally {button.disabled=false;}
+}
 function mobilePin(create) {
- authLayout('<h1>Mobile verified.</h1><p>Complete PIN verification to open your account.</p>');
+ authLayout('<h1>Mobile verified.</h1><p>Complete PIN verification to open your account.</p><button class="btn full" id="resume-pin">Continue with PIN</button><button class="text-btn" id="use-another-number">Use another mobile number</button><div class="form-error" id="verification-error" role="alert"></div>');
+ const changeNumber=async()=>{try{await api('/mobile/verification',{method:'DELETE'});closeModal();mobileLogin();}catch(err){document.getElementById('verification-error').textContent=err.message;}};
+ document.getElementById('use-another-number').onclick=changeNumber;
  const finish=async(pin,confirmPin)=>{await api('/mobile/complete',{method:'POST',body:JSON.stringify({pin,confirmPin})});modalBusy=false;closeModal();await csrf();state.user=await api('/me');state.reveal=false;if(location.hash==='#dashboard')await renderRoute();else location.hash='dashboard';};
- const choose=()=>pinKeypad(create?'Create your PIN':'Enter your PIN',create?'Choose six digits to protect login and transactions.':'Enter your six-digit VelisBank PIN.',async pin=>{if(!create)return finish(pin,null);pinKeypad('Confirm your PIN','Enter the same six digits again.',async confirmation=>{if(pin!==confirmation)throw {message:'PINs do not match. Try again.'};await finish(pin,confirmation);},{back:choose});},{back:()=>{closeModal();mobileLogin();}});choose();
+ const choose=()=>{pinKeypad(create?'Create your PIN':'Enter your PIN',create?'Choose six digits to protect login and transactions.':'Enter your six-digit VelisBank PIN.',async pin=>{if(!create)return finish(pin,null);pinKeypad('Confirm your PIN','Enter the same six digits again.',async confirmation=>{if(pin!==confirmation)throw {message:'PINs do not match. Try again.'};await finish(pin,confirmation);},{back:choose});},{back:()=>closeModal()});
+ if(!create){const button=document.createElement('button');button.type='button';button.className='text-btn forgot-verified-pin';button.textContent='Forgot PIN?';button.onclick=()=>forgotVerifiedPin(button);document.getElementById('keypad-form').append(button);}
+ };
+ document.getElementById('resume-pin').onclick=()=>login();
+ choose();
 }
 function moneySteps(active) {
  return `<ol class="money-steps" aria-label="Transaction progress">${['Enter details','Verify PIN','Review & confirm'].map((text,i)=>`<li ${active===i+1?'aria-current="step"':''} class="${i+1<=active?'reached':''}"><span>${i+1}</span>${text}</li>`).join('')}</ol>`;
@@ -153,7 +180,57 @@ function pinKeypad(title,description,onComplete,{progress='',back=null}={}) {
  if(back)document.getElementById('pin-back').onclick=back;
  f.onsubmit=async event=>{event.preventDefault();if(input.value.length!==6)return;const value=input.value;modalBusy=true;f.querySelectorAll('button,input').forEach(el=>el.disabled=true);try{await onComplete(value);}catch(err){if(f.isConnected){document.getElementById('keypad-error').textContent=err.message||'Please try again.';input.value='';f.querySelectorAll('button,input').forEach(el=>el.disabled=false);sync();input.focus();}}finally{modalBusy=false;}};
 }
-function setupPin() { closeModal(); mobileLogin('',state.user?.phone||'','RESET'); }
+let profileReset=null, profileResetCancellation=Promise.resolve();
+async function cancelProfileReset() {
+ const flow=profileReset;if(!flow)return;
+ profileReset=null;flow.cancelled=true;clearInterval(flow.timer);
+ try {await api('/pin/reset',{method:'DELETE'});}catch(err){toast(err.message);}
+}
+async function setupPin() {
+ await profileResetCancellation;
+ if(!state.pinConfigured){closeModal();mobileLogin('',state.user?.phone||'','RESET');return;}
+ if(profileReset)return;
+ const flow={cancelled:false};profileReset=flow;
+ modal('Reset PIN', '<p class="muted">Preparing OTP verification for your registered mobile number...</p>');
+ const current=()=>profileReset===flow&&!flow.cancelled;
+ const confirm=newPin=>{
+  if(!current())return;
+  pinKeypad('Confirm new PIN','Enter your new PIN again. Closing this dialog cancels the reset.',async confirmation=>{
+   if(newPin!==confirmation)throw {message:'PINs do not match. Try again.'};
+   await api('/pin/reset/complete',{method:'POST',body:JSON.stringify({id:flow.id,pin:newPin,confirmPin:confirmation})});
+   if(!current())return;
+   profileReset=null;clearInterval(flow.timer);modalBusy=false;closeModal();toast('Your PIN has been reset.');
+  });
+ };
+ const newPin=()=>{if(!current())return;pinKeypad('Enter new PIN','Choose a new six-digit PIN.',async pin=>confirm(pin),{back:()=>closeModal()});actions();};
+ const currentPin=()=>{if(!current())return;pinKeypad('Enter your current PIN','Verify your current PIN before choosing a new one.',async pin=>{
+  await api('/pin/reset/current',{method:'POST',body:JSON.stringify({id:flow.id,code:pin})});if(current())newPin();
+ });};
+ const otp=async()=>{
+  const result=await api('/pin/reset',{method:'POST'});if(!current())return;
+  flow.id=result.id;clearInterval(flow.timer);
+  modal('Reset PIN OTP validation',`<section class="profile-reset-otp"><div class="otp-illustration" aria-hidden="true"><svg viewBox="0 0 120 110" fill="none"><rect x="20" y="26" width="43" height="75" rx="9" stroke="currentColor" stroke-width="2.5"/><path d="M20 83h43M32 34h12" stroke="currentColor" stroke-width="2.5"/><circle cx="42" cy="92" r="2" fill="currentColor"/><path d="M59 12h42a7 7 0 0 1 7 7v23a7 7 0 0 1-7 7H79L67 61V49h-8a7 7 0 0 1-7-7V19a7 7 0 0 1 7-7Z" fill="#f9faff" stroke="currentColor" stroke-width="2.5"/><path d="M64 30h1m9 0h1m9 0h1m9 0h1" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg><img src="/favicon.svg" alt="" width="26" height="26"></div><p>Enter the six-digit ${result.localTest?'test ':''}code for<br><strong>${esc(result.maskedPhone)}</strong>.</p><form id="profile-reset-otp"><div class="form-error" role="alert"></div>${field('code','Verification code','text','',{max:6,min:6,pattern:'[0-9]{6}',autocomplete:'one-time-code'})}<button class="btn full" type="submit">Verify OTP</button></form><p id="reset-countdown" role="timer"></p><button id="reset-resend" class="text-btn" disabled>Resend code</button></section>`);
+  const form=document.getElementById('profile-reset-otp'),submit=form.querySelector('[type=submit]'),resend=document.getElementById('reset-resend');form.elements.code.inputMode='numeric';
+  const original=form.elements.code;
+  original.type='hidden';original.removeAttribute('id');original.removeAttribute('required');
+  const digits=document.createElement('div');digits.className='profile-otp-digits';digits.setAttribute('role','group');digits.setAttribute('aria-label','Verification code');
+  for(let i=0;i<6;i++){
+   const digit=document.createElement('input');digit.type='text';digit.inputMode='numeric';digit.autocomplete=i===0?'one-time-code':'off';digit.maxLength=6;digit.required=true;digit.pattern='[0-9]';digit.setAttribute('aria-label',`Verification code digit ${i+1}`);
+   const sync=()=>{original.value=[...digits.children].map(el=>el.value).join('');};
+   const distribute=text=>{const code=text.replace(/\D/g,'').slice(0,6);if(!code)return;const start=code.length===6?0:i;for(let n=0;n<code.length&&start+n<6;n++)digits.children[start+n].value=code[n];sync();digits.children[Math.min(start+code.length,5)].focus();};
+   digit.oninput=()=>{const value=digit.value.replace(/\D/g,'');if(value.length>1){distribute(value);return;}digit.value=value;sync();if(value&&i<5)digits.children[i+1].focus();};
+   digit.onpaste=e=>{e.preventDefault();distribute(e.clipboardData.getData('text'));};
+   digit.onkeydown=e=>{if(e.key==='Backspace'&&!digit.value&&i>0){e.preventDefault();digits.children[i-1].value='';sync();digits.children[i-1].focus();}if(e.key==='ArrowLeft'&&i>0){e.preventDefault();digits.children[i-1].focus();}if(e.key==='ArrowRight'&&i<5){e.preventDefault();digits.children[i+1].focus();}};
+   digit.onfocus=()=>digit.select();digits.append(digit);
+  }
+  original.after(digits);form.querySelector('label').removeAttribute('for');digits.firstChild.focus();
+  const deadline=performance.now()+result.remainingMillis;
+  const tick=()=>{if(!current()||!form.isConnected){clearInterval(flow.timer);return;}const seconds=Math.max(0,Math.ceil((deadline-performance.now())/1000));document.getElementById('reset-countdown').textContent=seconds?`Resend available in ${seconds}s`:'';resend.disabled=seconds>0;};tick();flow.timer=setInterval(tick,1000);
+  resend.onclick=async()=>{resend.disabled=true;try{await otp();if(current())document.getElementById('profile-reset-otp').insertAdjacentHTML('beforebegin','<p role="status" class="otp-resend-notice">New OTP sent. Your previous code has expired. Enter the newest code.</p>');}catch(err){if(current()){errors(form,err);resend.disabled=false;}}};
+  form.onsubmit=async e=>{e.preventDefault();submit.disabled=true;modalBusy=true;try{await api('/pin/reset/otp',{method:'POST',body:JSON.stringify({id:flow.id,code:form.elements.code.value})});clearInterval(flow.timer);if(current())currentPin();}catch(err){if(current()){errors(form,err);submit.disabled=false;tick();}}finally{modalBusy=false;}};
+ };
+ try {await otp();}catch(err){if(current()){modal('Reset PIN',`<div class="form-error">${esc(err.message)}</div>`);}}
+}
 function verifyTransactionPin(payload,form) {
  pinKeypad('Enter your PIN','Verify your identity before reviewing this transaction.',async pin=>{const review=await api('/money/verify-pin',{method:'POST',body:JSON.stringify({...payload,pin})});confirmMoney({...payload,pin},review,form);},{progress:moneySteps(2),back:()=>closeModal()});
 }
@@ -172,6 +249,7 @@ function modal(title,body) {
 }
 function closeModal(animate=false) {
  if(modalBusy)return;
+ if(profileReset)profileResetCancellation=cancelProfileReset();
  const root=overlay.firstChild;
  const finish=()=>{if(root&&overlay.firstChild!==root)return;overlay.innerHTML='';app.inert=false;document.body.style.overflow='';if(modalPreviousFocus?.isConnected)modalPreviousFocus.focus();};
  if(animate&&root&&!matchMedia('(prefers-reduced-motion: reduce)').matches){root.classList.add('is-closing');setTimeout(finish,170);}else finish();
@@ -213,9 +291,11 @@ function customerDetail(a) {
  document.getElementById('toggle-status').onclick=()=>{const verb=a.status==='ACTIVE'?'Freeze':'Unfreeze';modal(`${verb} account?`,`<p class="muted" style="font-size:12px;margin-bottom:22px">${verb==='Freeze'?'This customer will temporarily be unable to deposit, withdraw, or transfer funds.':'This customer will be able to deposit, withdraw, and transfer funds again.'}</p>${info([['Customer',esc(fullName(a.customer))],['Account',masked(a.number)]])}<div class="form-error" id="status-error" style="margin-top:15px" role="alert"></div><div class="form-actions"><button class="btn secondary" data-action="close-modal">Cancel</button><button id="confirm-status" class="btn ${verb==='Freeze'?'danger':''}">${verb} account</button></div>`);document.getElementById('confirm-status').onclick=async()=>{modalBusy=true;overlay.querySelectorAll('button').forEach(b=>b.disabled=true);try{await api(`/admin/accounts/${a.id}/status`,{method:'PATCH',body:JSON.stringify({status:a.status==='ACTIVE'?'FROZEN':'ACTIVE'})});modalBusy=false;closeModal();await renderRoute();toast(`Account ${verb==='Freeze'?'frozen':'unfrozen'}.`);}catch(err){modalBusy=false;document.getElementById('status-error').textContent=err.message;overlay.querySelectorAll('button').forEach(b=>b.disabled=false);}};};
 }
 async function renderRoute() {
- const version=++state.routeVersion;closeModal();const [route='home',id]=(location.hash.slice(1)||'home').split('/');
+ const version=++state.routeVersion;closeModal();const [route='welcome',id]=(location.hash.slice(1)||'welcome').split('/');
+ if(route==='home'){location.replace('#'+(state.user?'dashboard':'welcome'));return;}
+ if(route==='welcome'){if(state.user){location.hash='dashboard';return;}welcomeScreen();return;}
  document.title=`${titles[route]||'Banking, made simple'} · VelisBank`;
- if(['home','login','register','admin-login'].includes(route)) {if(state.user){location.hash='dashboard';return;}if(route==='home')landing();else if(route==='login'){login(state.loginMessage);state.loginMessage='';}else if(route==='admin-login'){adminLogin();document.title='Administration · VelisBank';}else registration();return;}
+ if(['login','register','admin-login'].includes(route)) {if(state.user){location.hash='dashboard';return;}if(route==='login'){login(state.loginMessage);state.loginMessage='';}else if(route==='admin-login'){adminLogin();document.title='Administration · VelisBank';}else registration();return;}
  if(!state.user){location.hash='login';return;}
  const loadingTimer=setTimeout(()=>{if(version===state.routeVersion){document.body.classList.add('is-loading');app.setAttribute('aria-busy','true');}},160);
  try {
@@ -265,3 +345,20 @@ window.addEventListener('hashchange',()=>{state.filter='ALL';state.search='';win
 
 
 
+
+function welcomeScreen() {
+ document.title='Welcome · VelisBank';
+ app.innerHTML=`<main class="welcome-screen"><div class="welcome-content"><div class="welcome-art" aria-hidden="true"><svg viewBox="0 0 300 300" fill="none"><defs><linearGradient id="wallet" x1="80" y1="130" x2="225" y2="260" gradientUnits="userSpaceOnUse"><stop stop-color="#a698f5"/><stop offset="1" stop-color="#51499a"/></linearGradient><linearGradient id="gold"><stop stop-color="#ffe5a1"/><stop offset="1" stop-color="#df963b"/></linearGradient></defs><ellipse cx="153" cy="261" rx="75" ry="12" fill="#0a0d23" opacity=".35"/><g stroke="#d99a43" stroke-width="4"><circle cx="118" cy="101" r="25" fill="url(#gold)"/><circle cx="155" cy="65" r="29" fill="url(#gold)"/><circle cx="192" cy="115" r="25" fill="url(#gold)"/></g><g fill="#b77926" font-family="sans-serif" font-size="30" font-weight="bold" text-anchor="middle"><text x="118" y="111">₱</text><text x="155" y="76">₱</text><text x="192" y="125">₱</text></g><path d="M88 147l114-18 18 113-117 17z" fill="#393574"/><path d="M78 143q-1-10 12-12l102-16q13-2 15 12l13 105q2 15-12 17l-104 13q-15 2-17-13z" fill="url(#wallet)"/><path d="M91 146l96-15q7-1 8 8l11 89q1 8-7 9l-96 13" stroke="#d8d2ff" stroke-width="2" stroke-dasharray="4 4"/><rect x="182" y="173" width="43" height="39" rx="13" fill="#5e57a4"/><circle cx="201" cy="192" r="9" fill="url(#gold)"/><path d="M52 99v13m-6-6h13M247 177v11m-5-6h11" stroke="#86c8b9" stroke-width="2" stroke-linecap="round"/><circle cx="234" cy="74" r="4" fill="#9385e3"/><circle cx="59" cy="222" r="4" fill="#edb964"/></svg></div><p>Welcome to</p><div class="welcome-brand"><img src="/favicon.svg" alt="" width="30" height="30"><h1>VelisBank</h1></div><a class="btn welcome-start" href="#login">Get Started</a></div></main>`;
+}
+
+// Reveal only the scrollbar belonging to the surface being scrolled.
+(() => {
+ const timers=new WeakMap();
+ document.addEventListener('scroll',event=>{
+  const surface=event.target===document?document.documentElement:event.target;
+  if(!(surface instanceof Element))return;
+  surface.classList.add('is-scrolling');
+  clearTimeout(timers.get(surface));
+  timers.set(surface,setTimeout(()=>{surface.classList.remove('is-scrolling');timers.delete(surface);},1000));
+ },{capture:true,passive:true});
+})();

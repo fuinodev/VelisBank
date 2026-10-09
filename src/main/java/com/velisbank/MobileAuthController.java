@@ -23,10 +23,25 @@ public class MobileAuthController {
     public record Complete(@NotBlank @Pattern(regexp="[0-9]{6}") String pin,@Size(max=6) String confirmPin) {}
     @PostMapping("/register") public Map<String,Boolean> register(@Valid @RequestBody Registration p){auth.register(p);return Map.of("ok",true);}
     @PostMapping("/otp") public Map<String,Object> send(@Valid @RequestBody Start p,HttpServletRequest req){
-        var session=req.getSession();synchronized(session){session.removeAttribute("mobileGrant");return auth.send(p.phone(),p.purpose(),session.getId());}
+        var session=req.getSession();synchronized(session){var result=auth.send(p.phone(),p.purpose(),session.getId());session.removeAttribute("mobileGrant");return result;}
     }
     @PostMapping("/verify") public Map<String,Object> verify(@Valid @RequestBody Verify p,HttpServletRequest req){
         var session=req.getSession();synchronized(session){var grant=auth.verify(p.phone(),p.purpose(),p.code(),session.getId());session.setAttribute("mobileGrant",grant);return Map.of("createPin",auth.needsPin(grant));}
+    }
+    @GetMapping("/verification") public Map<String,Object> verification(HttpServletRequest req,HttpServletResponse res) {
+        res.setHeader("Cache-Control","no-store");
+        var session=req.getSession(false);
+        if(session==null)return Map.of("verified",false);
+        synchronized(session) {
+            var grant=(MobileAuthService.Grant)session.getAttribute("mobileGrant");
+            if(!auth.resumable(grant)) {session.removeAttribute("mobileGrant");return Map.of("verified",false);}
+            return Map.of("verified",true,"createPin",auth.needsPin(grant),"phone",auth.verifiedPhone(grant));
+        }
+    }
+    @DeleteMapping("/verification") public Map<String,Boolean> clearVerification(HttpServletRequest req) {
+        var session=req.getSession(false);
+        if(session!=null)synchronized(session){session.removeAttribute("mobileGrant");}
+        return Map.of("ok",true);
     }
     @PostMapping("/complete") public Map<String,Boolean> complete(@Valid @RequestBody Complete p,HttpServletRequest req,HttpServletResponse res){
         var session=req.getSession();synchronized(session){

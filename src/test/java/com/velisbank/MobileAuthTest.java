@@ -77,6 +77,81 @@ class MobileAuthTest {
         assertThat(reset.call("POST","/api/mobile/complete",Map.of("pin","582941","confirmPin","582941")).statusCode()).isEqualTo(400);
         assertThat(reset.call("POST","/api/mobile/complete",Map.of("pin","739251","confirmPin","739251")).statusCode()).isEqualTo(200);
     }
+    @Autowired MobileAuthService mobileAuth;
+    @Test void verifiedSessionResumesPinWithoutAnotherOtp() throws Exception {
+        Browser b=new Browser();String phone=register(b);
+        assertThat(b.call("GET","/api/mobile/verification",null).body()).contains("\"verified\":false");
+        b.call("POST","/api/mobile/otp",Map.of("phone",phone,"purpose","LOGIN"));
+        String code=codes.get(phone);
+        b.call("POST","/api/mobile/verify",Map.of("phone",phone,"purpose","LOGIN","code",code));
+        for(int i=0;i<2;i++) {
+            var status=b.call("GET","/api/mobile/verification",null);
+            assertThat(status.body()).contains("\"verified\":true","\"createPin\":true");
+            assertThat(status.headers().firstValue("Cache-Control")).contains("no-store");
+        }
+        assertThat(codes.get(phone)).isEqualTo(code);
+        assertThat(new Browser().call("GET","/api/mobile/verification",null).body()).contains("\"verified\":false");
+        assertThat(b.call("GET","/api/account",null).statusCode()).isEqualTo(401);
+        assertThat(b.call("POST","/api/mobile/complete",Map.of("pin","582941","confirmPin","582941")).statusCode()).isEqualTo(200);
+        assertThat(b.call("GET","/api/mobile/verification",null).body()).contains("\"verified\":false");
+        b.call("POST","/api/logout",null);
+        assertThat(b.call("GET","/api/mobile/verification",null).body()).contains("\"verified\":false");
+        expire(phone);
+        b.call("POST","/api/mobile/otp",Map.of("phone",phone,"purpose","LOGIN"));
+        b.call("POST","/api/mobile/verify",Map.of("phone",phone,"purpose","LOGIN","code",codes.get(phone)));
+        assertThat(b.call("GET","/api/mobile/verification",null).body()).contains("\"verified\":true","\"createPin\":false");
+        assertThat(b.call("POST","/api/mobile/complete",Map.of("pin","000000")).statusCode()).isEqualTo(400);
+        assertThat(b.call("GET","/api/mobile/verification",null).body()).contains("\"verified\":true");
+        assertThat(b.call("DELETE","/api/mobile/verification",null).statusCode()).isEqualTo(200);
+        assertThat(b.call("GET","/api/mobile/verification",null).body()).contains("\"verified\":false");
+        assertThat(b.call("POST","/api/mobile/complete",Map.of("pin","582941")).statusCode()).isEqualTo(400);
+        var customer=customers.findByMobileLogin(phone).orElseThrow();
+        assertThat(mobileAuth.resumable(new MobileAuthService.Grant(customer.username,"LOGIN",java.time.Instant.now().minusSeconds(1),customer.pinHash))).isFalse();
+        assertThat(mobileAuth.resumable(new MobileAuthService.Grant(customer.username,"LOGIN",java.time.Instant.now().plusSeconds(300),"old-pin-version"))).isFalse();
+    }
+    @Test void forgotPinUsesFreshResetOtpImmediatelyAfterVerifiedLogin() throws Exception {
+        Browser b=new Browser();String phone=register(b);
+        b.call("POST","/api/mobile/otp",Map.of("phone",phone,"purpose","LOGIN"));
+        b.call("POST","/api/mobile/verify",Map.of("phone",phone,"purpose","LOGIN","code",codes.get(phone)));
+        b.call("POST","/api/mobile/complete",Map.of("pin","582941","confirmPin","582941"));
+        b.call("POST","/api/logout",null);expire(phone);
+        b.call("POST","/api/mobile/otp",Map.of("phone",phone,"purpose","LOGIN"));
+        b.call("POST","/api/mobile/verify",Map.of("phone",phone,"purpose","LOGIN","code",codes.get(phone)));
+        assertThat(b.call("GET","/api/mobile/verification",null).body()).contains(phone);
+        assertThat(new Browser().call("POST","/api/mobile/otp",Map.of("phone",phone,"purpose","RESET")).statusCode()).isEqualTo(400);
+        assertThat(b.call("POST","/api/mobile/otp",Map.of("phone",phone,"purpose","RESET")).statusCode()).isEqualTo(200);
+        assertThat(b.call("POST","/api/mobile/complete",Map.of("pin","739251","confirmPin","739251")).statusCode()).isEqualTo(400);
+        String resetCode=codes.get(phone);
+        assertThat(b.call("POST","/api/mobile/verify",Map.of("phone",phone,"purpose","LOGIN","code",resetCode)).statusCode()).isEqualTo(400);
+        assertThat(b.call("POST","/api/mobile/verify",Map.of("phone",phone,"purpose","RESET","code",resetCode)).statusCode()).isEqualTo(200);
+        assertThat(b.call("POST","/api/mobile/complete",Map.of("pin","582941","confirmPin","582941")).statusCode()).isEqualTo(400);
+        assertThat(b.call("POST","/api/mobile/complete",Map.of("pin","739251","confirmPin","739251")).statusCode()).isEqualTo(200);
+        assertThat(b.call("GET","/api/account",null).statusCode()).isEqualTo(200);
+    }
+    @Test void profileResetRequiresOtpCurrentPinAndCancellationInvalidatesFlow() throws Exception {
+        Browser b=new Browser();String phone=register(b);
+        b.call("POST","/api/mobile/otp",Map.of("phone",phone,"purpose","LOGIN"));
+        b.call("POST","/api/mobile/verify",Map.of("phone",phone,"purpose","LOGIN","code",codes.get(phone)));
+        b.call("POST","/api/mobile/complete",Map.of("pin","582941","confirmPin","582941"));
+        assertThat(new Browser().call("POST","/api/pin/reset",null).statusCode()).isEqualTo(401);
+        var started=b.call("POST","/api/pin/reset",null);assertThat(started.statusCode()).isEqualTo(200);
+        String id=json.readTree(started.body()).get("id").asString();
+        assertThat(b.call("POST","/api/pin/reset/current",Map.of("id",id,"code","582941")).statusCode()).isEqualTo(400);
+        assertThat(b.call("POST","/api/pin/reset/otp",Map.of("id",id,"code",codes.get(phone))).statusCode()).isEqualTo(200);
+        assertThat(b.call("POST","/api/pin/reset/complete",Map.of("id",id,"pin","739251","confirmPin","739251")).statusCode()).isEqualTo(400);
+        assertThat(b.call("POST","/api/pin/reset/current",Map.of("id",id,"code","000000")).statusCode()).isEqualTo(400);
+        assertThat(b.call("POST","/api/pin/reset/current",Map.of("id",id,"code","582941")).statusCode()).isEqualTo(200);
+        assertThat(b.call("DELETE","/api/pin/reset",null).statusCode()).isEqualTo(200);
+        assertThat(b.call("POST","/api/pin/reset/complete",Map.of("id",id,"pin","739251","confirmPin","739251")).statusCode()).isEqualTo(400);
+        started=b.call("POST","/api/pin/reset",null);assertThat(started.statusCode()).isEqualTo(200);
+        id=json.readTree(started.body()).get("id").asString();
+        assertThat(b.call("POST","/api/pin/reset/otp",Map.of("id",id,"code",codes.get(phone))).statusCode()).isEqualTo(200);
+        assertThat(b.call("POST","/api/pin/reset/current",Map.of("id",id,"code","582941")).statusCode()).isEqualTo(200);
+        assertThat(b.call("POST","/api/pin/reset/complete",Map.of("id",id,"pin","739251","confirmPin","111111")).statusCode()).isEqualTo(400);
+        assertThat(b.call("POST","/api/pin/reset/complete",Map.of("id",id,"pin","739251","confirmPin","739251")).statusCode()).isEqualTo(200);
+        assertThat(b.call("POST","/api/pin/reset/complete",Map.of("id",id,"pin","582941","confirmPin","582941")).statusCode()).isEqualTo(400);
+        assertThat(b.call("GET","/api/account",null).statusCode()).isEqualTo(200);
+    }
     @Test void otpExpiresLocksAndCannotBeResentEarly() throws Exception {
         Browser b=new Browser();String phone=register(b);b.call("POST","/api/mobile/otp",Map.of("phone",phone,"purpose","LOGIN"));
         Browser other=new Browser();assertThat(other.call("POST","/api/mobile/otp",Map.of("phone",phone,"purpose","LOGIN")).statusCode()).isEqualTo(400);

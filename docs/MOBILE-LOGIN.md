@@ -7,11 +7,10 @@ Transactions require the PIN only. Administrator username/password login is reta
 
 ## Local testing (no actual texts)
 
-Run in PowerShell before starting the app:
+The local startup scripts default to local test delivery when `SMS_MODE` is unset. To explicitly select it:
 
 ```powershell
-$env:SMS_MODE = 'local'
-.\scripts\start.ps1
+.\scripts\start.ps1 -SmsMode local
 ```
 
 The OTP screen clearly labels this mode. The application log prints the code with a `LOCAL TEST ONLY` label (in the terminal, or `data/application.log` when redirected there). You can also open `data/local-sms/<country-code-and-number>.txt` locally to read the most recent test message. The folder is ignored by Git. No code is returned by the API. Never enable this mode on a public server. Real SMS codes are not logged.
@@ -50,3 +49,13 @@ https://www.twilio.com/docs/messaging/api/message-resource
 https://www.twilio.com/en-us/guidelines/ph/sms
 
 Administrator entry: open `http://localhost:8080/#admin-login` directly or bookmark it. Customer login, registration and PIN recovery do not display an Administrator link. This separate page preserves the existing administrator role enforcement and login cooldown; a hidden URL is not an authorization control. Administrator MFA is not implemented by this page separation.
+
+## Resume verified login
+
+After a valid OTP, the server session retains the pending verification for five minutes. Reloading or returning to Login resumes PIN entry (or PIN creation for a first login). Closing the dialog leaves a Continue with PIN button. Use another mobile number explicitly clears the pending verification. PIN completion consumes it; logout, expiry, or a changed PIN requires fresh verification. No OTP or PIN is saved in browser storage. Run `node scripts/mobile-session-check.cjs` for browser recovery checks.
+
+`rebuild-start.ps1` also accepts `-SmsMode local`, `twilio`, or `disabled`. An existing `SMS_MODE` environment setting is preserved unless overridden by this argument. The application configuration itself still defaults to disabled outside these local startup scripts.
+
+Verified-login PIN entry includes Forgot PIN. It reuses the session-verified number and requests a separate RESET OTP, displaying only a masked number. A consumed LOGIN OTP may transition immediately to RESET in the same session; reset still requires its own valid code, and another session cannot use that transition. The new PIN must differ from the old one.
+
+Profile Reset PIN is a separate authenticated flow: saved-number OTP verification, current PIN verification, new PIN, and confirmation. Back, Cancel, dialog close, or navigation cancels the pending reset. No new PIN is written until final confirmation. Cancellation is also enforced server-side, and the flow cannot be completed through the public Forgot PIN endpoint.

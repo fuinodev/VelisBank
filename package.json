@@ -1,6 +1,6 @@
 {
   "name": "velisbank-browser-checks",
   "private": true,
-  "scripts": {"test:ui": "node scripts/ui-smoke.cjs"},
+  "scripts": {"test:ui": "node scripts/ui-smoke.cjs", "test:responsive": "node scripts/tablet-responsive-check.cjs"},
   "devDependencies": {"playwright": "1.62.1"}
 }
